@@ -1,0 +1,4 @@
+mongodb+srv://dbUser:sJBYD6Emn2NSQukP@cluster0-ysx0c.mongodb.net/production?retryWrites=true&w=majority
+mongodb+srv://dbUser:sJBYD6Emn2NSQukP@cluster0-ysx0c.mongodb.net/development?retryWrites=true&w=majority
+mongodb+srv://dbUser:sJBYD6Emn2NSQukP@cluster0-ysx0c.mongodb.net/test?retryWrites=true&w=majority
+
