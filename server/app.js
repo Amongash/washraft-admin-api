@@ -23,6 +23,7 @@ module.exports = config => {
   // app.use(express.static(path.join(__dirname, '../public')));
   app.get('/favicon.ico', (req, res) => res.sendStatus(204));
 
+  app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({ extended: true }));
   app.use(cookieParser());
 
@@ -30,9 +31,9 @@ module.exports = config => {
     app.set('trust proxy', 'loopback');
   }
 
-  app.use(auth.initialize);
-  app.use(auth.session);
-  app.use(auth.setUser);
+  // app.use(auth.initialize);
+  // app.use(auth.session);
+  // app.use(auth.setUser);
 
   app.use('/', routes({ images }));
 
@@ -55,7 +56,6 @@ module.exports = config => {
     res.locals.error = req.app.get('env') === 'development' ? err : {};
     res.status(status);
     log.fatal(err);
-    // res.render('error');
   });
 
   return app;

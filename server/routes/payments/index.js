@@ -3,19 +3,12 @@ const PaymentModel = require('../../models/PaymentModel');
 
 const router = express.Router();
 
-function redirectIfNotLoggedIn(req, res, next) {
-  if (!req.user) return res.redirect('/users');
-  return next();
-}
-
 module.exports = () => {
-  // const { images } = params;
-
-  router.get('/', redirectIfNotLoggedIn, (req, res) => {
+  router.get('/', (req, res) => {
     res.status(200).send('payment');
   });
 
-  router.post('/', redirectIfNotLoggedIn, async (req, res, next) => {
+  router.post('/', async (req, res, next) => {
     try {
       const payment = new PaymentModel({
         amountPaid: req.body.amountPaid,
