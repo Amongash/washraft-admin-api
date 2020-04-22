@@ -5,35 +5,50 @@ const middlewares = require('../middlewares');
 
 const router = express.Router();
 
-function redirectIfLoggedIn(req, res, next) {
-  if (req.user) return res.redirect('/');
-  return next();
-}
-
 module.exports = params => {
   const { images } = params;
 
-  router.get('/login', redirectIfLoggedIn, (req, res) => {
-    res.json('login');
-    // res.render('users/login', { error: req.query.error })
+  router.get('/redirect/', (req, res, next) => {
+    if (req.user) {
+      console.log('User is logged in!');
+      return res.redirect('/');
+    }
+    if (!req.user) {
+      console.log('Incorrect Username or password');
+      return res.json('Incorrect Username or password');
+    }
+
+    return next();
+  });
+
+  router.get('/login', (req, res) => {
+    // TODO
+    /**
+     * Add application logic to provide the login page to the user.
+     */
+    if (!req.user) {
+      console.log('Login page');
+      return res.json('Login page');
+    }
+    return res.redirect('/');
   });
 
   router.post(
     '/login',
     passport.authenticate('local', {
-      successRedirect: '/',
-      failureRedirect: '/users/login?error=true',
+      successRedirect: '/users/redirect',
+      failureRedirect: '/users/redirect',
     })
   );
 
   router.get('/logout', (req, res) => {
     req.logout();
+    console.log('User has been logged out!');
     return res.redirect('/');
   });
 
-  router.get('/registration', redirectIfLoggedIn, (req, res) => {
-    res.json();
-    // res.render('users/registration', { success: req.query.success })
+  router.get('/registration', (req, res) => {
+    return res.redirect('/users/redirect');
   });
 
   router.post(
@@ -58,7 +73,10 @@ module.exports = params => {
 
         const savedUser = await user.save();
 
-        if (savedUser) return res.json('Success: true');
+        if (savedUser) {
+          console.log(`User has been created`, savedUser);
+          return res.json('Success: true');
+        }
         return next(new Error('Failed to save user for unknown reasons'));
       } catch (err) {
         if (req.file && req.file.storeFilename) {
