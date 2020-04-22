@@ -1,0 +1,191 @@
+{
+	"info": {
+		"_postman_id": "b65c6a7a-f76b-4a4c-a2ba-db033fdc1e45",
+		"name": "Washraft API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "User registration",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "email",
+							"value": "a2@bitches.com",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "pissword",
+							"type": "text"
+						},
+						{
+							"key": "firstName",
+							"value": "alpha",
+							"type": "text"
+						},
+						{
+							"key": "lastName",
+							"value": "meal",
+							"type": "text"
+						},
+						{
+							"key": "phoneNumber",
+							"value": "123456782",
+							"type": "text"
+						},
+						{
+							"key": "username",
+							"value": "pettypeaches2",
+							"type": "text"
+						},
+						{
+							"key": "tag",
+							"value": "12",
+							"type": "text"
+						},
+						{
+							"key": "address",
+							"value": "5454",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:3000/users/registration",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"users",
+						"registration"
+					]
+				},
+				"description": "required fields = [\n\temail,\n\tpassword,\n\tfirstName,\n\tlastName,\n\tphoneNumber,\n\tusername,\n\ttag,\n]"
+			},
+			"response": []
+		},
+		{
+			"name": "User login",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/x-www-form-urlencoded",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": []
+				},
+				"url": {
+					"raw": "http://localhost:3000/users/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"users",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "User login",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/x-www-form-urlencoded",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "email",
+							"value": "a@bitches.com",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "pissword",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:3000/users/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"users",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Homepage",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Logout",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/users/logout",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"users",
+						"logout"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
