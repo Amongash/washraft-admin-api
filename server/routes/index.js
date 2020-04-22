@@ -5,7 +5,7 @@ const router = express.Router();
 
 module.exports = params => {
   router.get('/', (req, res) => {
-    res.status(200).send('You are home.');
+    res.status(200).send('hello');
   });
 
   router.use('/users', usersRoute(params));
