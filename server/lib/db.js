@@ -5,4 +5,5 @@ module.exports.connect = async dsn =>
     useNewUrlParser: true,
     useUnifiedTopology: true,
     useCreateIndex: true,
+    useFindAndModify: false,
   });
