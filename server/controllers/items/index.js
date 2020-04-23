@@ -1,13 +1,13 @@
 const Item = require('../../models/ItemModel');
 
 exports.index = async (req, res, next) => {
-  Item.find({}).exec((err, items) => {
+  Item.find({}, (err, items) => {
     if (err) return next(err);
     return res.json(items);
   });
 };
 
-exports.create = async (req, res, next) => {
+exports.addNewItem = async (req, res, next) => {
   try {
     const item = new Item({
       type: req.body.type,
@@ -24,20 +24,43 @@ exports.create = async (req, res, next) => {
   }
 };
 
-exports.findById = async (req, res, next) => {
-  const { itemId } = req.params;
-  console.log(itemId);
-  await Item.findById(itemId).exec((err, item) => {
-    if (err) return next(err);
-    console.log(`Item: `, item);
-    return res.json(item);
-  });
+exports.getById = async (req, res, next) => {
+  try {
+    const { itemId } = req.params;
+    await Item.findById(itemId, (err, item) => {
+      if (err) return next(new Error('Failed to retrieve item for unknown reasons'));
+      console.log(`Item: `, item);
+      return res.json(item);
+    });
+  } catch (err) {
+    return next(err);
+  }
 };
 
-exports.update = async (req, res) => {
-  return res.json('Item updated successfully');
+exports.update = async (req, res, next) => {
+  try {
+    await Item.findOneAndUpdate(
+      { _id: req.params.itemId },
+      req.body,
+      { new: true },
+      (err, item) => {
+        if (err) return next(new Error('Failed to update item for unknown reasons'));
+        console.log(`Item: `, item);
+        return res.json(item);
+      }
+    );
+  } catch (err) {
+    return next(err);
+  }
 };
 
-exports.destroy = async (req, res) => {
-  return res.json('Item deleted successfully');
+exports.delete = async (req, res, next) => {
+  try {
+    await Item.deleteOne({ _id: req.params.itemId }, err => {
+      if (err) return next(new Error('Failed to delete item for unknown reasons'));
+      return res.json({ message: 'Item deleted successfully' });
+    });
+  } catch (err) {
+    return next(err);
+  }
 };
