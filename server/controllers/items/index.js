@@ -12,6 +12,7 @@ exports.addNewItem = async (req, res, next) => {
     const item = new Item({
       type: req.body.type,
       description: req.body.description,
+      price: req.body.price,
     });
     const savedItem = await item.save();
     if (savedItem) {
