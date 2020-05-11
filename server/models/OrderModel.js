@@ -8,7 +8,7 @@ const OrderSchema = mongoose.Schema(
       required: true,
     },
     totalQuantity: {
-      type: mongoose.Types.Decimal128,
+      type: Number,
       required: true,
     },
     status: {
@@ -16,16 +16,6 @@ const OrderSchema = mongoose.Schema(
     },
     remarks: {
       type: String,
-    },
-    invoiceNo: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Payment',
-      required: true,
-    },
-    orderItemId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'OrderItem',
-      required: true,
     },
   },
   { timestamps: true }

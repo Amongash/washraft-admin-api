@@ -1,6 +1,7 @@
 const express = require('express');
 const usersRoute = require('./users');
 const itemsRoute = require('./items');
+const ordersRoute = require('./orders');
 
 const router = express.Router();
 
@@ -11,5 +12,7 @@ module.exports = params => {
 
   router.use('/users', usersRoute(params));
   router.use('/items', itemsRoute(params));
+  router.use('/orders', ordersRoute(params));
+
   return router;
 };
