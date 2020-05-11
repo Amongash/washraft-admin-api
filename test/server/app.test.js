@@ -15,12 +15,12 @@ describe('The Application', () => {
     const res = await chai.request(app).get('/');
     res.should.have.status(200);
   });
-  it('should have a speakers route', async () => {
-    const res = await chai.request(app).get('/speakers');
+  it('should have an item route', async () => {
+    const res = await chai.request(app).get('/items');
     res.should.have.status(200);
   });
-  it('should have a feedback route', async () => {
-    const res = await chai.request(app).get('/feedback');
+  it('should have an order route', async () => {
+    const res = await chai.request(app).get('/orders');
     res.should.have.status(200);
   });
   it('should have a registration route', async () => {

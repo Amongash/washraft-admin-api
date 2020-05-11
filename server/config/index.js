@@ -12,7 +12,7 @@ module.exports = {
   development: {
     siteName: 'washraft',
     log: loggers.development,
-    data: { images: path.join(__dirname, '../data/avatars') },
+    data: { images: path.join(__dirname, '../data/images') },
     database: {
       dsn: process.env.DEVELOPMENT_DB_DSN,
     },
@@ -20,7 +20,7 @@ module.exports = {
   production: {
     siteName: 'washraft',
     log: loggers.production,
-    data: { images: path.join(__dirname, '../data/avatars') },
+    data: { images: path.join(__dirname, '../data/images') },
     database: {
       dsn: process.env.PRODUCTION_DB_DSN,
     },
@@ -28,7 +28,7 @@ module.exports = {
   test: {
     siteName: 'washraft',
     log: loggers.test,
-    data: { images: path.join(__dirname, '../data/avatars') },
+    data: { images: path.join(__dirname, '../data/images') },
     database: {
       dsn: process.env.TEST_DB_DSN,
     },

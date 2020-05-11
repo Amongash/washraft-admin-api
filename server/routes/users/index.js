@@ -101,11 +101,8 @@ module.exports = params => {
     return res.sendFile(images.filepath(req.params.filename));
   });
 
-  router.get('/:id', async (req, res, next) => {
-    try {
-    } catch (err) {
-      return next();
-    }
+  router.get('/account', (req, res) => {
+    return res.status(200).send();
   });
 
   return router;

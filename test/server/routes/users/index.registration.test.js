@@ -14,8 +14,7 @@ describe('The /users/registration route', () => {
   beforeEach(async () => helper.before());
   afterEach(async () => helper.after());
   it('should return an error 500 with empty request', async () => {
-    const res = await chai.request(app)
-      .post('/users/registration');
+    const res = await chai.request(app).post('/users/registration');
     res.should.have.status(500);
   });
   it('should show a success message after succesful registration', async () => {
@@ -25,7 +24,7 @@ describe('The /users/registration route', () => {
       .set('content-type', 'application/x-www-form-urlencoded')
       .send(helper.validUser);
     res.should.have.status(200);
-    res.text.should.contain('Thank you for your registration!');
+    res.text.should.contain('Success: true');
     const user = await UserModel.findOne({ email: helper.validUser.email });
     expect(user).to.be.instanceOf(UserModel);
   });

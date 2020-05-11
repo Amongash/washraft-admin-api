@@ -4,7 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const util = require('util');
 
-let AvatarService = null;
+let ImageService = null;
 let db = null;
 let UserModel = null;
 
@@ -24,7 +24,7 @@ try {
 
 try {
   // eslint-disable-next-line import/no-unresolved
-  AvatarService = require('../../server/services/AvatarService');
+  ImageService = require('../../server/services/ImageService');
 } catch (err) {
   console.log('Avatars ignored');
 }
@@ -45,13 +45,18 @@ async function deleteFilesInDir(directory) {
 }
 
 module.exports.UserModel = UserModel;
-module.exports.AvatarService = AvatarService;
+module.exports.ImageService = ImageService;
 module.exports.config = config;
 
 module.exports.validUser = {
-  username: 'Frank',
-  email: 'frank@acme.org',
-  password: 'verysecret',
+  email: 'admin@washraft.com',
+  password: 'password',
+  firstName: 'mr',
+  lastName: 'admin',
+  phoneNumber: 123456789,
+  username: 'admin',
+  tag: 1,
+  address: 12345,
 };
 
 module.exports.before = async () => {
@@ -69,7 +74,7 @@ module.exports.after = async () => {
     await UserModel.deleteMany({});
   }
 
-  return deleteFilesInDir(config.data.avatars);
+  return deleteFilesInDir(config.data.images);
 };
 
 // Local helper function that creates a user
