@@ -10,6 +10,7 @@ module.exports = () => {
   router.post('/create', orders.addNewOrder);
 
   router.get('/:orderId', orders.getById);
+  router.get('/users/:userId', orders.getByUserId);
   router.put('/:orderId', orders.update);
   router.delete('/:orderId', orders.delete);
 

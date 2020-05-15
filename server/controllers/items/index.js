@@ -1,4 +1,4 @@
-const Item = require('../../models/ItemModel');
+const { Item } = require('../../models');
 
 exports.index = async (req, res, next) => {
   Item.find({}, (err, items) => {
