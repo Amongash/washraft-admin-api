@@ -2,9 +2,8 @@ const mongoose = require('mongoose');
 
 const OrderItem = mongoose.Schema(
   {
-    itemType: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'ItemPrice',
+    type: {
+      type: String,
       required: true,
     },
     unit: {

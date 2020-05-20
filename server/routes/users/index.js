@@ -22,10 +22,7 @@ module.exports = params => {
   });
 
   router.get('/login', (req, res) => {
-    // TODO
-    /**
-     * Add application logic to provide the login page to the user.
-     */
+    // TODO Add application logic to provide the login page to the user.
     if (!req.user) {
       console.log('Login page');
       return res.json('Login page');
