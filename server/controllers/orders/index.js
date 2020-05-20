@@ -26,7 +26,7 @@ exports.addNewOrder = async (req, res, next) => {
       },
     ];
 
-    //TODO Remove hardcoded order items and use posted order items
+    // TODO Remove hardcoded order items and use posted order items
 
     // const { orderItems } = req.body;
 
