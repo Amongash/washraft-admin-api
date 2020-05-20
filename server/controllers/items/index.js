@@ -1,7 +1,8 @@
-const { Item } = require('../../models');
+/* eslint-disable consistent-return */
+const { ItemPrice } = require('../../models');
 
 exports.index = async (req, res, next) => {
-  Item.find({}, (err, items) => {
+  ItemPrice.find({}, (err, items) => {
     if (err) return next(err);
     return res.json(items);
   });
@@ -9,14 +10,13 @@ exports.index = async (req, res, next) => {
 
 exports.addNewItem = async (req, res, next) => {
   try {
-    const item = new Item({
+    const item = new ItemPrice({
       type: req.body.type,
-      description: req.body.description,
       price: req.body.price,
     });
     const savedItem = await item.save();
     if (savedItem) {
-      console.log(`Item has been saved`, savedItem);
+      console.log(`ItemPrice has been saved`, savedItem);
       return res.json('Success: true');
     }
     return next(new Error('Failed to save item for unknown reasons'));
@@ -28,9 +28,9 @@ exports.addNewItem = async (req, res, next) => {
 exports.getById = async (req, res, next) => {
   try {
     const { itemId } = req.params;
-    await Item.findById(itemId, (err, item) => {
+    await ItemPrice.findById(itemId, (err, item) => {
       if (err) return next(new Error('Failed to retrieve item for unknown reasons'));
-      console.log(`Item: `, item);
+      console.log(`ItemPrice: `, item);
       return res.json(item);
     });
   } catch (err) {
@@ -40,13 +40,13 @@ exports.getById = async (req, res, next) => {
 
 exports.update = async (req, res, next) => {
   try {
-    await Item.findOneAndUpdate(
+    await ItemPrice.findOneAndUpdate(
       { _id: req.params.itemId },
       req.body,
       { new: true },
       (err, item) => {
         if (err) return next(new Error('Failed to update item for unknown reasons'));
-        console.log(`Item: `, item);
+        console.log(`ItemPrice: `, item);
         return res.json(item);
       }
     );
@@ -57,9 +57,9 @@ exports.update = async (req, res, next) => {
 
 exports.delete = async (req, res, next) => {
   try {
-    await Item.deleteOne({ _id: req.params.itemId }, err => {
+    await ItemPrice.deleteOne({ _id: req.params.itemId }, err => {
       if (err) return next(new Error('Failed to delete item for unknown reasons'));
-      return res.json({ message: 'Item deleted successfully' });
+      return res.json({ message: 'ItemPrice deleted successfully' });
     });
   } catch (err) {
     return next(err);
