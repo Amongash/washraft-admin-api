@@ -4,15 +4,13 @@ const orders = require('../../controllers/orders');
 const router = express.Router();
 
 module.exports = () => {
-  // const { images } = params;
+  router.get('/', orders.index); // list all orders
+  router.post('/create', orders.addNewOrder); // create an order
 
-  router.get('/', orders.index);
-  router.post('/create', orders.addNewOrder);
-
-  router.get('/:orderId', orders.getById);
-  router.get('/users/:userId', orders.getByUserId);
-  router.put('/:orderId', orders.update);
-  router.delete('/:orderId', orders.delete);
+  router.get('/:orderId', orders.getById); // retrieve by Order ID
+  router.get('/users/:userId', orders.getByUserId); // retrieve all orders for the specified user
+  router.put('/:orderId', orders.update); // update an order
+  router.delete('/:orderId', orders.delete); // delete an order
 
   return router;
 };
