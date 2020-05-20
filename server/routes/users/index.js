@@ -1,6 +1,6 @@
 const express = require('express');
 const passport = require('passport');
-const UserModel = require('../../models/UserModel');
+const { User } = require('../../models');
 const middlewares = require('../middlewares');
 
 const router = express.Router();
@@ -22,10 +22,7 @@ module.exports = params => {
   });
 
   router.get('/login', (req, res) => {
-    // TODO
-    /**
-     * Add application logic to provide the login page to the user.
-     */
+    // TODO Add application logic to provide the login page to the user.
     if (!req.user) {
       console.log('Login page');
       return res.json('Login page');
@@ -57,7 +54,7 @@ module.exports = params => {
     middlewares.handleImage(images),
     async (req, res, next) => {
       try {
-        const user = new UserModel({
+        const user = new User({
           firstName: req.body.firstName,
           lastName: req.body.lastName,
           username: req.body.username,

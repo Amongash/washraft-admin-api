@@ -1,5 +1,6 @@
-const Order = require('../../models/OrderModel');
-// const OrderOrder = require('../../models/OrderOrderModel');
+/* eslint-disable no-underscore-dangle */
+const { Order } = require('../../models');
+
 // const OrderStatus = require('../../models/OrderStatusModel');
 
 exports.index = async (req, res, next) => {
@@ -9,22 +10,55 @@ exports.index = async (req, res, next) => {
   });
 };
 
+// eslint-disable-next-line consistent-return
 exports.addNewOrder = async (req, res, next) => {
   try {
-    console.log(req.user.id);
+    const orderItems = [
+      {
+        type: 'shirt',
+        unit: 5,
+        price: 100,
+      },
+      {
+        type: 'shirt',
+        unit: 10,
+        price: 50,
+      },
+    ];
+
+    //TODO Remove hardcoded order items and use posted order items
+
+    // const { orderItems } = req.body;
+
+    console.log(orderItems);
     const order = new Order({
-      userId: req.user.id,
+      userId: req.user._id,
       totalQuantity: req.body.totalQuantity,
       status: req.body.status,
       remarks: req.body.remarks,
+      items: orderItems,
     });
+    // eslint-disable-next-line consistent-return
+    await order.save((err, items) => {
+      if (err) return next(err);
+      console.log(items);
+      return res.json({ Success: true });
+    });
+  } catch (err) {
+    return next(err);
+  }
+};
 
-    const savedOrder = await order.save();
-    if (savedOrder) {
-      console.log(`Order has been saved`, savedOrder);
-      return res.json('Success: true');
-    }
-    return next(new Error('Failed to save order for unknown reasons'));
+// eslint-disable-next-line consistent-return
+exports.getByUserId = async (req, res, next) => {
+  try {
+    const { userId } = req.params.userId;
+    const fields = 'totalQuantity remarks status items';
+    await Order.find(userId, fields, (err, order) => {
+      if (err) return next(err);
+      console.log(`Order: `, order);
+      return res.json(order);
+    });
   } catch (err) {
     return next(err);
   }
@@ -34,8 +68,8 @@ exports.addNewOrder = async (req, res, next) => {
 exports.getById = async (req, res, next) => {
   try {
     const { orderId } = req.params;
-    await Order.findById(orderId, (err, order) => {
-      if (err) return next(new Error('Failed to retrieve order for unknown reasons'));
+    await Order.findById(orderId).exec((err, order) => {
+      if (err) return next(err);
       console.log(`Order: `, order);
       return res.json(order);
     });
@@ -47,6 +81,8 @@ exports.getById = async (req, res, next) => {
 // eslint-disable-next-line consistent-return
 exports.update = async (req, res, next) => {
   try {
+    // TODO Update orders and order items.
+
     await Order.findOneAndUpdate(
       { _id: req.params.orderId },
       req.body,
