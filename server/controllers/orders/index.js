@@ -10,21 +10,27 @@ exports.index = async (req, res, next) => {
   });
 };
 
+// eslint-disable-next-line consistent-return
 exports.addNewOrder = async (req, res, next) => {
   try {
     const orderItems = [
       {
-        itemType: '5ea1aae72d30c36a2c36f988',
+        type: 'shirt',
         unit: 5,
         price: 100,
       },
       {
-        itemType: '5ea1aae72d30c36a2c36f988',
+        type: 'shirt',
         unit: 10,
         price: 50,
       },
     ];
 
+    //TODO Remove hardcoded order items and use posted order items
+
+    // const { orderItems } = req.body;
+
+    console.log(orderItems);
     const order = new Order({
       userId: req.user._id,
       totalQuantity: req.body.totalQuantity,
@@ -47,20 +53,12 @@ exports.addNewOrder = async (req, res, next) => {
 exports.getByUserId = async (req, res, next) => {
   try {
     const { userId } = req.params.userId;
-    await Order.find(userId, (err, order) => {
+    const fields = 'totalQuantity remarks status items';
+    await Order.find(userId, fields, (err, order) => {
       if (err) return next(err);
       console.log(`Order: `, order);
       return res.json(order);
     });
-    // await Order.find()
-    //   // .populate({ path: 'orderitems', select: 'unit' })
-    //   // // .populate({ path: 'items', select: 'type, price' })
-    //   // // .exec();
-
-    //   .exec((err, order) => {
-    //     if (err) return next(err);
-    //     return res.json(order);
-    //   });
   } catch (err) {
     return next(err);
   }
@@ -70,13 +68,11 @@ exports.getByUserId = async (req, res, next) => {
 exports.getById = async (req, res, next) => {
   try {
     const { orderId } = req.params;
-    await Order.findById(orderId)
-      .populate('items')
-      .exec((err, order) => {
-        if (err) return next(err);
-        console.log(`Order: `, order);
-        return res.json(order);
-      });
+    await Order.findById(orderId).exec((err, order) => {
+      if (err) return next(err);
+      console.log(`Order: `, order);
+      return res.json(order);
+    });
   } catch (err) {
     return next(err);
   }
@@ -85,6 +81,8 @@ exports.getById = async (req, res, next) => {
 // eslint-disable-next-line consistent-return
 exports.update = async (req, res, next) => {
   try {
+    // TODO Update orders and order items.
+
     await Order.findOneAndUpdate(
       { _id: req.params.orderId },
       req.body,
