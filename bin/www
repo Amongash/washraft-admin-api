@@ -8,7 +8,7 @@ const http = require('http');
 // const os = require('os');
 const config = require('../server/config')[process.env.NODE_ENV || 'development'];
 const app = require('../server/app')(config);
-const db = require('../server/lib/db');
+const mongodb = require('../server/lib/database/mongoose');
 
 const log = config.log();
 
@@ -63,7 +63,8 @@ const server = http.createServer(app);
 //       log.fatal(err);
 //     });
 // }
-db.connect(config.database.dsn)
+mongodb
+  .connect(config.database.dsn)
   .then(() => {
     log.info('Connected to MongoDB');
     server.listen(port);

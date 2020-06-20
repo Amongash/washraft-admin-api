@@ -8,9 +8,10 @@ const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const mongoose = require('mongoose');
 const MongoStore = require('connect-mongo')(session);
-const auth = require('./lib/auth');
+const { utils } = require('./lib/auth');
 const routes = require('./routes');
 const ImageService = require('./services/ImageService');
+// const ROLES = require('./helpers/roles');
 
 module.exports = config => {
   const app = express();
@@ -47,9 +48,12 @@ module.exports = config => {
     app.set('trust proxy', 'loopback');
   }
 
-  app.use(auth.initialize);
-  app.use(auth.session);
-  app.use(auth.setUser);
+  app.use(utils.initialize);
+  app.use(utils.session);
+  app.use(utils.setUser);
+  app.use(utils.setup);
+  // routes(app);
+  // initialiseAuthentication(app);
 
   app.use('/', routes({ images }));
 
