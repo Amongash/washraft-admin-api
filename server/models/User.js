@@ -8,17 +8,17 @@ const UserSchema = mongoose.Schema(
   {
     firstName: {
       type: String,
-      required: true,
+      // required: true,
       minlength: 2,
     },
     lastName: {
       type: String,
-      required: true,
+      // required: true,
       minlength: 2,
     },
     phoneNumber: {
       type: Number,
-      required: true,
+      // required: true,
       unique: true,
     },
     username: {
@@ -28,24 +28,62 @@ const UserSchema = mongoose.Schema(
       index: { unique: true },
       minlength: 3,
     },
-    email: {
-      type: String,
-      required: true,
-      trim: true,
-      lowercase: true,
-      index: { unique: true },
-      validate: {
-        validator: emailValidator.validate,
-        message: props => `${props.value} is not a valid email address!`,
+    local: {
+      email: {
+        type: String,
+        required: true,
+        trim: true,
+        lowercase: true,
+        index: { unique: true },
+        validate: {
+          validator: emailValidator.validate,
+          message: props => `${props.value} is not a valid email address!`,
+        },
+      },
+      password: {
+        type: String,
+        required: true,
+        trim: true,
+        index: { unique: true },
+        minlength: 8,
       },
     },
-    password: {
-      type: String,
-      required: true,
-      trim: true,
-      index: { unique: true },
-      minlength: 8,
+    facebook: {
+      id: String,
+      token: String,
+      email: String,
+      name: String,
     },
+    twitter: {
+      id: String,
+      token: String,
+      displayName: String,
+      username: String,
+    },
+    google: {
+      id: String,
+      token: String,
+      email: String,
+      name: String,
+    },
+    // email: {
+    //   type: String,
+    //   required: true,
+    //   trim: true,
+    //   lowercase: true,
+    //   index: { unique: true },
+    //   validate: {
+    //     validator: emailValidator.validate,
+    //     message: props => `${props.value} is not a valid email address!`,
+    //   },
+    // },
+    // password: {
+    //   type: String,
+    //   required: true,
+    //   trim: true,
+    //   index: { unique: true },
+    //   minlength: 8,
+    // },
     image: {
       type: String,
     },
@@ -55,7 +93,7 @@ const UserSchema = mongoose.Schema(
     },
     tag: {
       type: String,
-      required: true,
+      // required: true,
     },
   },
   { timestamps: true }
