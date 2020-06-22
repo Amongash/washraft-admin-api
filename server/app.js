@@ -8,9 +8,11 @@ const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const mongoose = require('mongoose');
 const MongoStore = require('connect-mongo')(session);
-const auth = require('./lib/auth');
+const passport = require('passport');
 const routes = require('./routes');
 const ImageService = require('./services/ImageService');
+
+require('./lib/passport')(passport);
 
 module.exports = config => {
   const app = express();
@@ -47,9 +49,12 @@ module.exports = config => {
     app.set('trust proxy', 'loopback');
   }
 
-  app.use(auth.initialize);
-  app.use(auth.session);
-  app.use(auth.setUser);
+  app.use(passport.initialize());
+  app.use(passport.session());
+  app.use(async (req, res, next) => {
+    res.locals.user = req.user;
+    return next();
+  });
 
   app.use('/', routes({ images }));
 

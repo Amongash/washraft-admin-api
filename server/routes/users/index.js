@@ -8,7 +8,7 @@ const router = express.Router();
 module.exports = params => {
   const { images } = params;
 
-  router.get('/redirect/', (req, res, next) => {
+  router.get('/redirect/', async (req, res, next) => {
     if (req.user) {
       console.log('User is logged in!');
       return res.redirect('/');
@@ -58,8 +58,8 @@ module.exports = params => {
           firstName: req.body.firstName,
           lastName: req.body.lastName,
           username: req.body.username,
-          email: req.body.email,
-          password: req.body.password,
+          'local.email': req.body.email,
+          'local.password': req.body.password,
           phoneNumber: req.body.phoneNumber,
           address: req.body.address,
           tag: req.body.tag,
@@ -86,7 +86,7 @@ module.exports = params => {
 
   router.get(
     '/account',
-    (req, res, next) => {
+    async (req, res, next) => {
       if (req.user) return next();
       return res.status(401).end();
     }

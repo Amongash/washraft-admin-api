@@ -1,5 +1,6 @@
 const express = require('express');
 const usersRoute = require('./users');
+const userRoleRoute = require('./roles');
 const itemsRoute = require('./items');
 const ordersRoute = require('./orders');
 const categoriesRoute = require('./category');
@@ -13,6 +14,7 @@ module.exports = params => {
   });
 
   router.use('/users', usersRoute(params));
+  router.use('/users/roles', userRoleRoute(params));
   router.use('/items', itemsRoute(params));
   router.use('/orders', ordersRoute(params));
   router.use('/user-payments', userPaymentsRoute(params));
