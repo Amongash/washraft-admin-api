@@ -100,10 +100,11 @@ const UserSchema = mongoose.Schema(
 );
 UserSchema.pre('save', async function preSave(next) {
   const user = this;
-  if (!user.isModified('password')) return next();
+
+  if (!user.isModified('local.password')) return next();
   try {
-    const hash = await bcrypt.hash(user.password, SALT_ROUNDS);
-    user.password = hash;
+    const hash = await bcrypt.hash(user.local.password, SALT_ROUNDS);
+    user.local.password = hash;
     return next();
   } catch (err) {
     return next(err);
@@ -111,7 +112,7 @@ UserSchema.pre('save', async function preSave(next) {
 });
 
 UserSchema.methods.comparePassword = async function comparePassword(candidate) {
-  return bcrypt.compare(candidate, this.password);
+  return bcrypt.compare(candidate, this.local.password);
 };
 
 const User = mongoose.model('User', UserSchema, 'users');
