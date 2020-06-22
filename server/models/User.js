@@ -8,17 +8,17 @@ const UserSchema = mongoose.Schema(
   {
     firstName: {
       type: String,
-      required: true,
+      // required: true,
       minlength: 2,
     },
     lastName: {
       type: String,
-      required: true,
+      // required: true,
       minlength: 2,
     },
     phoneNumber: {
       type: Number,
-      required: true,
+      // required: true,
       unique: true,
     },
     username: {
@@ -28,24 +28,62 @@ const UserSchema = mongoose.Schema(
       index: { unique: true },
       minlength: 3,
     },
-    email: {
-      type: String,
-      required: true,
-      trim: true,
-      lowercase: true,
-      index: { unique: true },
-      validate: {
-        validator: emailValidator.validate,
-        message: props => `${props.value} is not a valid email address!`,
+    local: {
+      email: {
+        type: String,
+        required: true,
+        trim: true,
+        lowercase: true,
+        index: { unique: true },
+        validate: {
+          validator: emailValidator.validate,
+          message: props => `${props.value} is not a valid email address!`,
+        },
+      },
+      password: {
+        type: String,
+        required: true,
+        trim: true,
+        index: { unique: true },
+        minlength: 8,
       },
     },
-    password: {
-      type: String,
-      required: true,
-      trim: true,
-      index: { unique: true },
-      minlength: 8,
+    facebook: {
+      id: String,
+      token: String,
+      email: String,
+      name: String,
     },
+    twitter: {
+      id: String,
+      token: String,
+      displayName: String,
+      username: String,
+    },
+    google: {
+      id: String,
+      token: String,
+      email: String,
+      name: String,
+    },
+    // email: {
+    //   type: String,
+    //   required: true,
+    //   trim: true,
+    //   lowercase: true,
+    //   index: { unique: true },
+    //   validate: {
+    //     validator: emailValidator.validate,
+    //     message: props => `${props.value} is not a valid email address!`,
+    //   },
+    // },
+    // password: {
+    //   type: String,
+    //   required: true,
+    //   trim: true,
+    //   index: { unique: true },
+    //   minlength: 8,
+    // },
     image: {
       type: String,
     },
@@ -55,17 +93,18 @@ const UserSchema = mongoose.Schema(
     },
     tag: {
       type: String,
-      required: true,
+      // required: true,
     },
   },
   { timestamps: true }
 );
 UserSchema.pre('save', async function preSave(next) {
   const user = this;
-  if (!user.isModified('password')) return next();
+
+  if (!user.isModified('local.password')) return next();
   try {
-    const hash = await bcrypt.hash(user.password, SALT_ROUNDS);
-    user.password = hash;
+    const hash = await bcrypt.hash(user.local.password, SALT_ROUNDS);
+    user.local.password = hash;
     return next();
   } catch (err) {
     return next(err);
@@ -73,7 +112,7 @@ UserSchema.pre('save', async function preSave(next) {
 });
 
 UserSchema.methods.comparePassword = async function comparePassword(candidate) {
-  return bcrypt.compare(candidate, this.password);
+  return bcrypt.compare(candidate, this.local.password);
 };
 
 const User = mongoose.model('User', UserSchema, 'users');
