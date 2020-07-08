@@ -13,36 +13,36 @@ exports.index = async (req, res, next) => {
 // eslint-disable-next-line consistent-return
 exports.addNewOrder = async (req, res, next) => {
   try {
-    const orderItems = [
-      {
-        type: 'shirt',
-        unit: 5,
-        price: 100,
-      },
-      {
-        type: 'shirt',
-        unit: 10,
-        price: 50,
-      },
-    ];
+    // const orderItems = [
+    //   {
+    //     type: 'shirt',
+    //     unit: 5,
+    //     price: 100,
+    //   },
+    //   {
+    //     type: 'shirt',
+    //     unit: 10,
+    //     price: 50,
+    //   },
+    // ];
 
     // TODO Remove hardcoded order items and use posted order items
 
-    // const { orderItems } = req.body;
+    const { orderItems } = req.body;
 
-    console.log(orderItems);
+    console.log(JSON.parse(orderItems));
     const order = new Order({
-      userId: req.user._id,
+      userId: '5eb95a807d92e5d260adb760',
       totalQuantity: req.body.totalQuantity,
       status: req.body.status,
       remarks: req.body.remarks,
-      items: orderItems,
+      items: JSON.parse(orderItems),
     });
     // eslint-disable-next-line consistent-return
     await order.save((err, items) => {
       if (err) return next(err);
       console.log(items);
-      return res.json({ Success: true });
+      return res.json({ success: true, message: 'Order received successfully' });
     });
   } catch (err) {
     return next(err);

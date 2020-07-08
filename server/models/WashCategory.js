@@ -7,13 +7,6 @@ const WashCategorySchema = mongoose.Schema(
       required: true,
       unique: true,
     },
-    items: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'ItemPrice',
-        required: true,
-      },
-    ],
   },
   { timestamps: true }
 );

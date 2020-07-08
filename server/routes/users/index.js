@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require('cors');
 const passport = require('passport');
 const { User } = require('../../models');
 const middlewares = require('../middlewares');
@@ -15,7 +16,8 @@ module.exports = params => {
     }
     if (!req.user) {
       console.log('Incorrect Username or password');
-      return res.json('Incorrect Username or password');
+      // return res.json('Incorrect Username or password');
+      return res.status(422).send({ error: "Incorrect Username or password" });
     }
 
     return next();
@@ -30,12 +32,32 @@ module.exports = params => {
     return res.redirect('/');
   });
 
+  router.options('/login', cors());
   router.post(
-    '/login',
-    passport.authenticate('local', {
-      successRedirect: '/users/redirect',
-      failureRedirect: '/users/redirect',
-    })
+    '/login', (req, res, next) => {
+      passport.authenticate('local',
+        (err, user, info) => {
+          if (err) {
+            return next(err);
+          }
+
+          if (!user) {
+            return res.status(422).send({ error: "Incorrect Username or password" });
+          }
+
+          req.logIn(user, function(err) {
+            if (err) {
+              return next(err);
+            }
+            return res.status(200).send({
+              firstName: user.firstName,
+              lastName: user.lastName,
+              username: user.username
+            });
+          });
+
+        })(req, res, next);
+    }
   );
 
   router.get('/logout', (req, res) => {
@@ -48,6 +70,7 @@ module.exports = params => {
     return res.redirect('/users/redirect');
   });
 
+  router.options('/registration', cors());
   router.post(
     '/registration',
     middlewares.upload.single('image'),

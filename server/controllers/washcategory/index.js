@@ -13,16 +13,15 @@ exports.index = async (req, res, next) => {
 
 exports.AddNewWashCategory = async (req, res, next) => {
   try {
-    const washcategory = new WashCategory({
+    const washCategory = new WashCategory({
       category: req.body.category,
-      items: req.body.items,
     });
-    const savedItem = await washcategory.save();
+    const savedItem = await washCategory.save();
     if (savedItem) {
       console.log(`WashCategory has been saved`, savedItem);
-      return res.json('Success: true');
+      return res.json({ success: true, message: 'Wash category created successfully'});
     }
-    return next(new Error('Failed to save washcategory for unknown reasons'));
+    return next(new Error('Failed to save washCategory for unknown reasons'));
   } catch (err) {
     return next(err);
   }
@@ -54,7 +53,7 @@ exports.update = async (req, res, next) => {
       (err, washcategory) => {
         if (err) return next(new Error('Failed to update washcategory for unknown reasons'));
         console.log(`WashCategory: `, washcategory);
-        return res.json(washcategory);
+        return res.json({ success: true, message: 'Wash category updated successfully' });
       }
     );
   } catch (err) {
@@ -65,8 +64,8 @@ exports.update = async (req, res, next) => {
 exports.delete = async (req, res, next) => {
   try {
     await WashCategory.deleteOne({ _id: req.params.washCategoryId }, err => {
-      if (err) return next(new Error('Failed to delete washcategory for unknown reasons'));
-      return res.json({ message: 'WashCategory deleted successfully' });
+      if (err) return next(new Error('Failed to delete wash category for unknown reasons'));
+      return res.json({ success: true, message: 'Wash Category deleted successfully' });
     });
   } catch (err) {
     return next(err);
