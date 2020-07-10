@@ -1,7 +1,8 @@
+require('dotenv').config();
 const LocalStrategy = require('passport-local').Strategy;
-// const FacebookStrategy = require('passport-facebook').Strategy;
+const FacebookStrategy = require('passport-facebook').Strategy;
 // const TwitterStrategy = require('passport-twitter').Strategy;
-// const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
+const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 
 // load up the user model
 const { User } = require('../models');
@@ -72,120 +73,122 @@ module.exports = passport => {
   // =========================================================================
   // LOCAL SIGNUP ============================================================
   // =========================================================================
+  // passport.use(
+  //   'local-signup',
+  //   new LocalStrategy(
+  //     {
+  //       // by default, local strategy uses username and password, we will override with email
+  //       usernameField: 'email',
+  //       passwordField: 'password',
+  //       passReqToCallback: true, // allows us to pass in the req from our route (consts us check if a user is logged in or not)
+  //     },
+  //     async (req, res, done) => {
+  //       try {
+  //         const existingUser = User.findOne({ 'local.email': req.email });
+
+  //         // check to see if there's already a user with that email
+  //         if (existingUser) return done(null, false, { message: 'That email is already taken.' });
+
+  //         //  If we're logged in, we're connecting a new local account.
+  //         if (req.user) {
+  //           const { user } = req;
+  //           user.local.email = email;
+  //           user.local.password = password;
+  //           user.save(err => {
+  //             if (err) throw err;
+  //             return done(null, user);
+  //           });
+  //         }
+  //         //  We're not logged in, so we're creating a brand new user.
+  //         else {
+  //           // create the user
+  //           const user = new User({
+  //             'local.email': req.email,
+  //             'local.password': req.password,
+  //           });
+
+  //           const newUser = await user.save();
+
+  //           if (newUser) {
+  //             console.log(`User has been created`, newUser);
+  //             return res.json('Success: true');
+  //           }
+  //         }
+  //       } catch (err) {
+  //         return done(err);
+  //       }
+  //       return done();
+  //     }
+  //   )
+  // );
+
+  // =========================================================================
+  // FACEBOOK ================================================================
+  // =========================================================================
   passport.use(
-    'local-signup',
-    new LocalStrategy(
+    'facebook',
+    new FacebookStrategy(
       {
-        // by default, local strategy uses username and password, we will override with email
-        usernameField: 'email',
-        passwordField: 'password',
+        clientID: process.env.FACEBOOK_APP_ID,
+        clientSecret: process.env.FACEBOOK_APP_SECRET,
+        callbackURL: `${process.env.SERVER_API_URL}/users/auth/facebook/callback`,
+        profileFields: ['email', 'name'],
         passReqToCallback: true, // allows us to pass in the req from our route (consts us check if a user is logged in or not)
       },
-      async (req, res, done) => {
-        try {
-          const existingUser = User.findOne({ 'local.email': req.email });
+      async (req, token, refreshToken, profile, done) => {
+        // eslint-disable-next-line no-underscore-dangle
+        const { email, first_name, last_name } = profile._json;
+        // check if the user is already logged in
+        if (!req.user) {
+          const existingUser = await User.findOne({ 'facebook.id': profile.id });
 
-          // check to see if there's already a user with that email
-          if (existingUser) return done(null, false, { message: 'That email is already taken.' });
+          if (existingUser) {
+            // if there is a user id already but no token (user was linked at one point and then removed)
+            if (!existingUser.facebook.token) {
+              existingUser.facebook.token = token;
+              // eslint-disable-next-line camelcase
+              existingUser.facebook.name = `${first_name} ${last_name}`;
+              existingUser.facebook.email = email;
 
-          //  If we're logged in, we're connecting a new local account.
-          if (req.user) {
-            const { user } = req;
-            user.local.email = email;
-            user.local.password = password;
-            user.save(err => {
-              if (err) throw err;
-              return done(null, user);
-            });
-          }
-          //  We're not logged in, so we're creating a brand new user.
-          else {
-            // create the user
-            const user = new User({
-              'local.email': req.email,
-              'local.password': req.password,
-            });
-
-            const newUser = await user.save();
-
-            if (newUser) {
-              console.log(`User has been created`, newUser);
-              return res.json('Success: true');
+              existingUser.save(err => {
+                if (err) throw err;
+                return done(null, existingUser);
+              });
             }
+
+            return done(null, existingUser); // user found, return that user
           }
-        } catch (err) {
-          return done(err);
+          // if there is no user, create them
+          const newUser = new User();
+          newUser.facebook.id = profile.id;
+          newUser.facebook.token = token;
+          // eslint-disable-next-line camelcase
+          newUser.facebook.name = `${first_name} ${last_name}`;
+          newUser.facebook.email = email;
+
+          newUser.save(err => {
+            if (err) throw err;
+            return done(null, newUser);
+          });
+        } else {
+          // user already exists and is logged in, we have to link accounts
+          const { user } = req; // pull the user out of the session
+
+          user.facebook.id = profile.id;
+          user.facebook.token = token;
+          // eslint-disable-next-line camelcase
+          user.facebook.name = `${first_name} ${last_name}`;
+          user.facebook.email = email;
+
+          user.save(err => {
+            if (err) throw err;
+            return done(null, user);
+          });
         }
         return done();
       }
     )
   );
-
-  // =========================================================================
-  // FACEBOOK ================================================================
-  // =========================================================================
-  //   passport.use(
-  //     new FacebookStrategy(
-  //       {
-  //         clientID: configAuth.facebookAuth.clientID,
-  //         clientSecret: configAuth.facebookAuth.clientSecret,
-  //         callbackURL: configAuth.facebookAuth.callbackURL,
-  //         passReqToCallback: true, // allows us to pass in the req from our route (consts us check if a user is logged in or not)
-  //       },
-  //       function(req, token, refreshToken, profile, done) {
-  //         // asynchronous
-  //         process.nextTick(function() {
-  //           // check if the user is already logged in
-  //           if (!req.user) {
-  //             User.findOne({ 'facebook.id': profile.id }, function(err, user) {
-  //               if (err) return done(err);
-
-  //               if (user) {
-  //                 // if there is a user id already but no token (user was linked at one point and then removed)
-  //                 if (!user.facebook.token) {
-  //                   user.facebook.token = token;
-  //                   user.facebook.name = `${profile.name.givenName} ${profile.name.familyName}`;
-  //                   user.facebook.email = profile.emails[0].value;
-
-  //                   user.save(function(err) {
-  //                     if (err) throw err;
-  //                     return done(null, user);
-  //                   });
-  //                 }
-
-  //                 return done(null, user); // user found, return that user
-  //               }
-  //               // if there is no user, create them
-  //               const newUser = new User();
-
-  //               newUser.facebook.id = profile.id;
-  //               newUser.facebook.token = token;
-  //               newUser.facebook.name = `${profile.name.givenName} ${profile.name.familyName}`;
-  //               newUser.facebook.email = profile.emails[0].value;
-
-  //               newUser.save(function(err) {
-  //                 if (err) throw err;
-  //                 return done(null, newUser);
-  //               });
-  //             });
-  //           } else {
-  //             // user already exists and is logged in, we have to link accounts
-  //             const { user } = req; // pull the user out of the session
-
-  //             user.facebook.id = profile.id;
-  //             user.facebook.token = token;
-  //             user.facebook.name = `${profile.name.givenName} ${profile.name.familyName}`;
-  //             user.facebook.email = profile.emails[0].value;
-
-  //             user.save(function(err) {
-  //               if (err) throw err;
-  //               return done(null, user);
-  //             });
-  //           }
-  //         });
-  //       }
-  //     )
-  //   );
 
   // =========================================================================
   // TWITTER =================================================================
@@ -256,65 +259,62 @@ module.exports = passport => {
   // =========================================================================
   // GOOGLE ==================================================================
   // =========================================================================
-  //   passport.use(
-  //     new GoogleStrategy(
-  //       {
-  //         clientID: configAuth.googleAuth.clientID,
-  //         clientSecret: configAuth.googleAuth.clientSecret,
-  //         callbackURL: configAuth.googleAuth.callbackURL,
-  //         passReqToCallback: true, // allows us to pass in the req from our route (consts us check if a user is logged in or not)
-  //       },
-  //       function(req, token, refreshToken, profile, done) {
-  //         // asynchronous
-  //         process.nextTick(function() {
-  //           // check if the user is already logged in
-  //           if (!req.user) {
-  //             User.findOne({ 'google.id': profile.id }, function(err, user) {
-  //               if (err) return done(err);
+  passport.use(
+    'google',
+    new GoogleStrategy(
+      {
+        clientID: process.env.GOOGLE_CLIENT_ID,
+        clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+        callbackURL: `${process.env.SERVER_API_URL}/users/auth/google/callback`,
+        passReqToCallback: true, // allows us to pass in the req from our route (consts us check if a user is logged in or not)
+      },
+      async (req, token, refreshToken, profile, done) => {
+        // check if the user is already logged in
+        if (!req.user) {
+          const user = User.findOne({ 'google.id': profile.id });
+          if (user) {
+            // if there is a user id already but no token (user was linked at one point and then removed)
+            if (!user.google.token) {
+              user.google.token = token;
+              user.google.name = profile.displayName;
+              user.google.email = profile.emails[0].value; // pull the first email
 
-  //               if (user) {
-  //                 // if there is a user id already but no token (user was linked at one point and then removed)
-  //                 if (!user.google.token) {
-  //                   user.google.token = token;
-  //                   user.google.name = profile.displayName;
-  //                   user.google.email = profile.emails[0].value; // pull the first email
+              user.save(err => {
+                if (err) throw err;
+                return done(null, user);
+              });
+            }
 
-  //                   user.save(function(err) {
-  //                     if (err) throw err;
-  //                     return done(null, user);
-  //                   });
-  //                 }
+            return done(null, user);
+          }
+          const newUser = new User();
 
-  //                 return done(null, user);
-  //               }
-  //               const newUser = new User();
+          newUser.google.id = profile.id;
+          newUser.google.token = token;
+          newUser.google.name = profile.displayName;
+          newUser.google.email = profile.emails[0].value; // pull the first email
 
-  //               newUser.google.id = profile.id;
-  //               newUser.google.token = token;
-  //               newUser.google.name = profile.displayName;
-  //               newUser.google.email = profile.emails[0].value; // pull the first email
+          newUser.save(err => {
+            if (err) throw err;
+            return done(null, newUser);
+          });
+        } else {
+          // user already exists and is logged in, we have to link accounts
+          const { user } = req; // pull the user out of the session
 
-  //               newUser.save(function(err) {
-  //                 if (err) throw err;
-  //                 return done(null, newUser);
-  //               });
-  //             });
-  //           } else {
-  //             // user already exists and is logged in, we have to link accounts
-  //             const { user } = req; // pull the user out of the session
+          user.google.id = profile.id;
+          user.google.token = token;
+          user.google.name = profile.displayName;
+          user.google.email = profile.emails[0].value; // pull the first email
 
-  //             user.google.id = profile.id;
-  //             user.google.token = token;
-  //             user.google.name = profile.displayName;
-  //             user.google.email = profile.emails[0].value; // pull the first email
+          user.save(err => {
+            if (err) throw err;
+            return done(null, user);
+          });
+        }
 
-  //             user.save(function(err) {
-  //               if (err) throw err;
-  //               return done(null, user);
-  //             });
-  //           }
-  //         });
-  //       }
-  //     )
-  //   );
+        return done();
+      }
+    )
+  );
 };

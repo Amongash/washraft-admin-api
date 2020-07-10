@@ -1,31 +1,34 @@
-import { UserModel } from '../schema'
+const { User } = require('../../../models');
 
-async function createUser({
-  firstName,
-  lastName,
-  email,
-  password,
-  providerId,
-  provider
-}) {
-  return new Promise(async (resolve, reject) => {
-    const user = await UserModel.findOne({ email })
-
-    if (user) {
-      reject('Email is already in use')
+exports.createUser = async req => {
+  try {
+    const { providerId, provider, firstName, lastName, email, password, role } = req;
+    const existingUser = await User.findOne({ email });
+    // check to see if there's already a user with that email
+    if (existingUser) {
+      return Promise.reject(new Error('That email is already taken.'));
     }
 
-    resolve(
-      await UserModel.create({
-        providerId,
-        provider,
-        firstName,
-        lastName,
-        email,
-        password
-      })
-    )
-  })
-}
+    //  We're not logged in, so we're creating a brand new user.
+    // create the user
+    console.log('Creating a new user.');
 
-export { createUser }
+    const savedUser = User.create({
+      providerId,
+      provider,
+      firstName,
+      lastName,
+      email,
+      password,
+      role,
+    });
+
+    if (savedUser) {
+      return Promise.resolve(savedUser);
+    }
+    return true;
+  } catch (error) {
+    console.log('Failure creating a new user.');
+    return Promise.reject(new Error('Unknown reason for failure'));
+  }
+};

@@ -1,71 +1,50 @@
-import passport from 'passport'
-import passportGoogle from 'passport-google-oauth'
-import { to } from 'await-to-js'
+/* eslint-disable camelcase */
+const passport = require('passport');
+const passportGoogle = require('passport-google-oauth');
 
-import { getUserByProviderId, createUser } from '../../database/user'
-import { signToken, getRedirectUrl } from '../utils'
-import { ROLES } from '../../../utils'
+const { getUserByProviderId, createUser } = require('../../database/user');
+const ROLES = require('../../../helpers/roles');
 
-const GoogleStrategy = passportGoogle.OAuth2Strategy
+const GoogleStrategy = passportGoogle.OAuth2Strategy;
 
 const strategy = app => {
   const strategyOptions = {
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: `${process.env.SERVER_API_URL}/auth/google/callback`
-  }
+    callbackURL: `${process.env.SERVER_API_URL}/auth/google/callback`,
+  };
 
   const verifyCallback = async (accessToken, refreshToken, profile, done) => {
-    let [err, user] = await to(getUserByProviderId(profile.id))
-    if (err || user) {
-      return done(err, user)
+    try {
+      // eslint-disable-next-line no-underscore-dangle
+      const { given_name, family_name, email, email_verified } = profile._json;
+
+      const user = await getUserByProviderId(profile.id);
+      if (user) return done(null, user);
+
+      if (email_verified) {
+        const createdUser = await createUser({
+          provider: profile.provider,
+          providerId: profile.id,
+          firstName: given_name,
+          lastName: family_name,
+          email,
+          password: null,
+          role: ROLES.Customer,
+        });
+
+        return done(null, createdUser);
+      }
+
+      return done(null);
+    } catch (error) {
+      return done(error);
     }
+  };
 
-    const verifiedEmail =
-      profile.emails.find(email => email.verified) || profile.emails[0]
+  passport.use(new GoogleStrategy(strategyOptions, verifyCallback));
 
-    const [createdError, createdUser] = await to(
-      createUser({
-        provider: profile.provider,
-        providerId: profile.id,
-        firstName: profile.name.givenName,
-        lastName: profile.name.familyName,
-        displayName: profile.displayName,
-        email: verifiedEmail.value,
-        password: null,
-        role: ROLES.Customer
-      })
-    )
+  return app;
+};
 
-    return done(createdError, createdUser)
-  }
-
-  passport.use(new GoogleStrategy(strategyOptions, verifyCallback))
-
-  app.get(
-    `${process.env.BASE_API_URL}/auth/google`,
-    passport.authenticate('google', {
-      scope: [
-        'https://www.googleapis.com/auth/userinfo.profile',
-        'https://www.googleapis.com/auth/userinfo.email'
-      ]
-    })
-  )
-
-  app.get(
-    `${process.env.BASE_API_URL}/auth/google/callback`,
-    passport.authenticate('google', { failureRedirect: '/login' }),
-    (req, res) => {
-      return res
-        .status(200)
-        .cookie('jwt', signToken(req.user), {
-          httpOnly: true
-        })
-        .redirect(getRedirectUrl(req.user.role))
-    }
-  )
-
-  return app
-}
-
-export { strategy }
+module.exports = { strategy };

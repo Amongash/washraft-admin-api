@@ -1,14 +1,11 @@
-const utils = require('./utils');
-
-const { JWTStrategy, LocalStrategy } = require('./strategies');
-
-const strategies = { JWTStrategy, LocalStrategy };
+import * as utils from './utils';
+import * as strategies from './strategies';
 
 const pipe = (...functions) => args => functions.reduce((arg, fn) => fn(arg), args);
 
-const initialiseAuthentication = app => {
+exports.initialiseAuthentication = app => {
   utils.setup();
-  pipe(strategies.JWTStrategy, strategies.LocalStrategy)(app);
+  pipe(strategies.JWTStrategy, strategies.FacebookStrategy, strategies.GoogleStrategy)(app);
 };
 
-export { utils, initialiseAuthentication, strategies };
+exports = { utils, strategies };

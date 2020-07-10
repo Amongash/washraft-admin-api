@@ -2,8 +2,9 @@ const passport = require('passport');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
-const ROLES = require('../../helpers/roles');
-const UserModel = require('../../models').User;
+const { User } = require('../../models');
+
+const SALT_ROUNDS = 10;
 
 const setup = () => {
   // eslint-disable-next-line no-underscore-dangle
@@ -11,7 +12,7 @@ const setup = () => {
 
   passport.deserializeUser(async (id, done) => {
     try {
-      const user = await UserModel.findById(id).exec();
+      const user = await User.findById(id).exec();
       return done(null, user);
     } catch (err) {
       return done(err);
@@ -30,7 +31,7 @@ const hashPassword = async password => {
     throw new Error('Password was not provided');
   }
 
-  const salt = await bcrypt.genSalt(10);
+  const salt = await bcrypt.genSalt(SALT_ROUNDS);
   return bcrypt.hash(password, salt);
 };
 
@@ -40,30 +41,33 @@ const verifyPassword = async (candidate, actual) => {
 
 const checkIsInRole = (...roles) => (req, res, next) => {
   if (!req.user) {
-    return res.redirect('/login');
+    return res.redirect('auth/login');
   }
 
   const hasRole = roles.find(role => req.user.role === role);
   if (!hasRole) {
-    return res.redirect('/login');
+    return res.redirect('auth/login');
   }
 
   return next();
 };
 
 const getRedirectUrl = role => {
-  console.log(role);
   switch (role) {
-    case ROLES.Admin:
+    case 'Admin':
       return '/admin-dashboard';
-    case ROLES.Customer:
+    case 'Customer':
       return '/customer-dashboard';
+    case 'PUStaff':
+      return '/pustaff-dashboard';
+    case 'DOStaff':
+      return '/dostaff-dashboard';
+    case 'LStaff':
+      return '/lstaff-dashboard';
     default:
       return '/';
   }
 };
-
-// export { setup, signToken, hashPassword, verifyPassword, checkIsInRole, getRedirectUrl }
 
 module.exports = {
   initialize: passport.initialize(),

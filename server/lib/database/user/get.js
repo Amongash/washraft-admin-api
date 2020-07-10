@@ -1,15 +1,15 @@
 const { User } = require('../../../models');
 
-async function getUserById(id) {
+const getUserById = id => {
   return User.findById(id).exec();
-}
+};
 
-async function getUserByEmail(email) {
+const getUserByEmail = email => {
   return User.findOne({ email }).exec();
-}
+};
 
-async function getUserByProviderId(providerId) {
+const getUserByProviderId = providerId => {
   return User.findOne({ providerId }).exec();
-}
+};
 
-module.export = { getUserById, getUserByEmail, getUserByProviderId };
+module.exports = { getUserById, getUserByEmail, getUserByProviderId };
