@@ -30,20 +30,22 @@ exports.addNewOrder = async (req, res, next) => {
 
     const { orderItems } = req.body;
 
-    console.log(JSON.parse(orderItems));
-    const order = new Order({
-      userId: '5eb95a807d92e5d260adb760',
-      totalQuantity: req.body.totalQuantity,
-      status: req.body.status,
-      remarks: req.body.remarks,
-      items: JSON.parse(orderItems),
-    });
-    // eslint-disable-next-line consistent-return
-    await order.save((err, items) => {
-      if (err) return next(err);
-      console.log(items);
-      return res.json({ success: true, message: 'Order received successfully' });
-    });
+    if (req.user) {
+      const order = new Order({
+        userId: req.user._id,
+        totalQuantity: req.body.totalQuantity,
+        status: req.body.status,
+        remarks: req.body.remarks,
+        items: JSON.parse(orderItems),
+      });
+      await order.save((err, items) => {
+        if (err) return next(err);
+        console.log(items);
+        return res.json({ success: true, message: 'Order received successfully' });
+      });
+    }
+    console.log('User must be logged in');
+    return res.json({ Error: 'Unable to create order' });
   } catch (err) {
     return next(err);
   }

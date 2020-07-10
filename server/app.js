@@ -12,8 +12,10 @@ const MongoStore = require('connect-mongo')(session);
 const passport = require('passport');
 const routes = require('./routes');
 const ImageService = require('./services/ImageService');
+const { utils } = require('./lib/auth');
 
-require('./lib/passport')(passport);
+const ROLES = require('./helpers/roles');
+const Role = require('./models/Role');
 
 module.exports = config => {
   const app = express();
@@ -60,6 +62,16 @@ module.exports = config => {
   });
 
   app.use('/', routes({ images }));
+
+  app.get(
+    '/admin-dashboard',
+    passport.authenticate('jwt', { failureRedirect: '/login' }),
+    // utils.checkIsInRole(ROLES.Admin),
+    (req, res) => {
+      console.log(`Logged in as `, ROLES.Admin);
+      return res.redirect('/');
+    }
+  );
 
   // catch 404 and forward to error handler
   app.use((req, res, next) => {

@@ -1,61 +1,45 @@
-import passport from 'passport'
-import passportFacebook from 'passport-facebook'
-import { to } from 'await-to-js'
+/* eslint-disable camelcase */
+require('dotenv').config();
+const passport = require('passport');
+const passportFacebook = require('passport-facebook');
 
-import { getUserByProviderId, createUser } from '../../database/user'
-import { signToken, getRedirectUrl } from '../utils'
-import { ROLES } from '../../../utils'
+const { getUserByProviderId, createUser } = require('../../database/user');
+const ROLES = require('../../../helpers/roles');
 
-const FacebookStrategy = passportFacebook.Strategy
+const FacebookStrategy = passportFacebook.Strategy;
 
 const strategy = app => {
   const strategyOptions = {
     clientID: process.env.FACEBOOK_APP_ID,
     clientSecret: process.env.FACEBOOK_APP_SECRET,
     callbackURL: `${process.env.SERVER_API_URL}/auth/facebook/callback`,
-    profileFields: ['id', 'displayName', 'name', 'emails']
-  }
+    profileFields: ['id', 'displayName', 'name', 'email'],
+  };
 
-  const verifyCallback = async (accessToken, refreshToken, profile, done) => {
-    let [err, user] = await to(getUserByProviderId(profile.id))
-    if (err || user) {
-      return done(err, user)
-    }
+  const verifyCallback = async (req, accessToken, refreshToken, profile, done) => {
+    try {
+      // eslint-disable-next-line no-underscore-dangle
+      const { first_name, last_name } = profile._json;
+      const user = await getUserByProviderId(profile.id);
+      if (user) return done(null, user);
 
-    const [createdError, createdUser] = await to(
-      createUser({
+      const createdUser = await createUser({
         providerId: profile.id,
         provider: profile.provider,
-        firstName: profile.name.givenName,
-        lastName: profile.name.familyName,
-        displayName: profile.displayName,
-        email: profile.emails[0].value,
-        password: null,
-        role: ROLES.Customer
-      })
-    )
+        firstName: first_name,
+        lastName: last_name,
+        role: ROLES.Customer,
+      });
 
-    return done(createdError, createdUser)
-  }
-
-  passport.use(new FacebookStrategy(strategyOptions, verifyCallback))
-
-  app.get(`${process.env.BASE_API_URL}/auth/facebook`, passport.authenticate('facebook'))
-
-  app.get(
-    `${process.env.BASE_API_URL}/auth/facebook/callback`,
-    passport.authenticate('facebook', { failureRedirect: '/login' }),
-    (req, res) => {
-      return res
-        .status(200)
-        .cookie('jwt', signToken(req.user), {
-          httpOnly: true
-        })
-        .redirect(getRedirectUrl(req.user.role))
+      return done(null, createdUser);
+    } catch (error) {
+      return done(error);
     }
-  )
+  };
 
-  return app
-}
+  passport.use(new FacebookStrategy(strategyOptions, verifyCallback));
 
-export { strategy }
+  return app;
+};
+
+module.exports = { strategy };

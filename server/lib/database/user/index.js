@@ -1,4 +1,4 @@
 const { getUserById, getUserByEmail, getUserByProviderId } = require('./get');
-// import { createUser } from './create'
+const { createUser } = require('./create');
 
-export { getUserById, getUserByEmail, getUserByProviderId };
+module.exports = { getUserById, getUserByEmail, getUserByProviderId, createUser };

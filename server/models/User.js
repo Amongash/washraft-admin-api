@@ -1,119 +1,49 @@
 const mongoose = require('mongoose');
-const emailValidator = require('email-validator');
-const bcrypt = require('bcrypt');
-
-const SALT_ROUNDS = 12;
 
 const UserSchema = mongoose.Schema(
   {
+    providerId: {
+      type: String,
+      required: true,
+    },
+    provider: { type: String },
     firstName: {
       type: String,
-      // required: true,
+      required: true,
       minlength: 2,
     },
     lastName: {
       type: String,
-      // required: true,
+      required: true,
       minlength: 2,
     },
-    phoneNumber: {
-      type: Number,
-      // required: true,
-      unique: true,
-    },
-    username: {
+    email: {
       type: String,
-      required: true,
+      trim: true,
+      lowercase: true,
+      index: { unique: true },
+    },
+    password: {
+      type: String,
       trim: true,
       index: { unique: true },
-      minlength: 3,
+      minlength: 8,
     },
-    local: {
-      email: {
-        type: String,
-        required: true,
-        trim: true,
-        lowercase: true,
-        index: { unique: true },
-        validate: {
-          validator: emailValidator.validate,
-          message: props => `${props.value} is not a valid email address!`,
-        },
-      },
-      password: {
-        type: String,
-        required: true,
-        trim: true,
-        index: { unique: true },
-        minlength: 8,
-      },
-    },
-    facebook: {
-      id: String,
-      token: String,
-      email: String,
-      name: String,
-    },
-    twitter: {
-      id: String,
-      token: String,
-      displayName: String,
-      username: String,
-    },
-    google: {
-      id: String,
-      token: String,
-      email: String,
-      name: String,
-    },
-    // email: {
-    //   type: String,
-    //   required: true,
-    //   trim: true,
-    //   lowercase: true,
-    //   index: { unique: true },
-    //   validate: {
-    //     validator: emailValidator.validate,
-    //     message: props => `${props.value} is not a valid email address!`,
-    //   },
-    // },
-    // password: {
-    //   type: String,
-    //   required: true,
-    //   trim: true,
-    //   index: { unique: true },
-    //   minlength: 8,
-    // },
+
     image: {
       type: String,
     },
     address: {
       type: String,
-      unique: true,
+      // unique: true,
     },
-    tag: {
+    role: {
       type: String,
       // required: true,
     },
   },
   { timestamps: true }
 );
-UserSchema.pre('save', async function preSave(next) {
-  const user = this;
-
-  if (!user.isModified('local.password')) return next();
-  try {
-    const hash = await bcrypt.hash(user.local.password, SALT_ROUNDS);
-    user.local.password = hash;
-    return next();
-  } catch (err) {
-    return next(err);
-  }
-});
-
-UserSchema.methods.comparePassword = async function comparePassword(candidate) {
-  return bcrypt.compare(candidate, this.local.password);
-};
 
 const User = mongoose.model('User', UserSchema, 'users');
 module.exports = User;

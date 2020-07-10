@@ -28,3 +28,16 @@ exports.add = async (req, res, next) => {
 exports.getByRole = async (req, res, next) => {
   // TODO add application logic to retrieve roles by using role_name as find parameter
 };
+
+exports.checkIsInRole = (...roles) => (req, res, next) => {
+  if (!req.user) {
+    return res.redirect('/users/login');
+  }
+
+  const hasRole = roles.find(role => req.user.role === role);
+  if (!hasRole) {
+    return res.redirect('/users/login');
+  }
+
+  return next();
+};

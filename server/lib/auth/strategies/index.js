@@ -1,4 +1,5 @@
-const JWTStrategy = require('./jwt');
-const LocalStrategy = require('./local');
+import { strategy as JWTStrategy } from './jwt';
+import { strategy as GoogleStrategy } from './google';
+import { strategy as FacebookStrategy } from './facebook';
 
-module.export = { JWTStrategy, LocalStrategy };
+export { JWTStrategy, GoogleStrategy, FacebookStrategy };

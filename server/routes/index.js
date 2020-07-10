@@ -1,5 +1,5 @@
 const express = require('express');
-const usersRoute = require('./users');
+const authRoute = require('./auth');
 const userRoleRoute = require('./roles');
 const itemsRoute = require('./items');
 const ordersRoute = require('./orders');
@@ -13,8 +13,12 @@ module.exports = params => {
     res.status(200).send('You are home.');
   });
 
-  router.use('/users', usersRoute(params));
-  router.use('/users/roles', userRoleRoute(params));
+  router.get('/admin_dashboard', (req, res) => {
+    res.status(200).send('Admin Dashboard');
+  });
+
+  router.use('/auth', authRoute(params));
+  router.use('/auth/roles', userRoleRoute(params));
   router.use('/items', itemsRoute(params));
   router.use('/orders', ordersRoute(params));
   router.use('/user-payments', userPaymentsRoute(params));
