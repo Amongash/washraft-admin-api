@@ -1,5 +1,6 @@
 require('dotenv').config();
 const express = require('express');
+const cors = require('cors');
 const compression = require('compression');
 const helmet = require('helmet');
 const createError = require('http-errors');
@@ -20,6 +21,8 @@ module.exports = config => {
   const app = express();
   app.use(helmet());
   app.use(compression());
+  // Added cors to handle cross origin requests from the client
+  app.use(cors());
   // const log = config.log();
   const images = new ImageService(config.data.images);
 

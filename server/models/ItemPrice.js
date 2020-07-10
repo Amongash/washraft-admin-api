@@ -13,6 +13,11 @@ const ItemPriceSchema = mongoose.Schema(
       type: Number,
       required: true,
     },
+    washCategory: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'WashCategory',
+        required: true,
+      },
   },
   { timestamps: true }
 );

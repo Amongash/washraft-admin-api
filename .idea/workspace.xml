@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="8dad60c4-a601-46a7-b26c-6bf7132d9f18" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/server/app.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/controllers/items/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/server/controllers/items/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/controllers/orders/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/server/controllers/orders/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/controllers/washcategory/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/server/controllers/washcategory/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/models/ItemPrice.js" beforeDir="false" afterPath="$PROJECT_DIR$/server/models/ItemPrice.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/models/WashCategory.js" beforeDir="false" afterPath="$PROJECT_DIR$/server/models/WashCategory.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/routes/users/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/server/routes/users/index.js" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectId" id="1dwUbJ0G6MOVZERRPicKGgUmSGb" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="TERMINAL_CUSTOM_COMMANDS_GOT_IT" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../Learning/digging-into-node" />
+    <property name="nodejs_package_manager_path" value="npm" />
+    <property name="prettierjs.PrettierConfiguration.Package" value="$PROJECT_DIR$/node_modules/prettier" />
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="8dad60c4-a601-46a7-b26c-6bf7132d9f18" name="Default Changelist" comment="" />
+      <created>1593335718962</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1593335718962</updated>
+      <workItem from="1593335720144" duration="445000" />
+      <workItem from="1593336360300" duration="1944000" />
+      <workItem from="1593360865666" duration="37000" />
+      <workItem from="1593405537085" duration="2328000" />
+      <workItem from="1593414951705" duration="191000" />
+      <workItem from="1593663035470" duration="7223000" />
+      <workItem from="1593756437074" duration="1263000" />
+      <workItem from="1594007354028" duration="2318000" />
+      <workItem from="1594025715049" duration="7000" />
+      <workItem from="1594104916661" duration="3499000" />
+      <workItem from="1594125473729" duration="725000" />
+      <workItem from="1594132599080" duration="32000" />
+      <workItem from="1594202786687" duration="5967000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="2" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="710" y="350" width="562" height="404" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1593336385564">
+      <screen x="67" y="27" width="1853" height="1052" />
+    </state>
+    <state x="710" y="350" width="562" height="404" key="#com.intellij.fileTypes.FileTypeChooser/67.27.1853.1052@67.27.1853.1052" timestamp="1593336385564" />
+    <state x="779" y="306" width="424" height="492" key="FileChooserDialogImpl" timestamp="1593415140885">
+      <screen x="67" y="27" width="1853" height="1052" />
+    </state>
+    <state x="779" y="306" width="424" height="492" key="FileChooserDialogImpl/67.27.1853.1052@67.27.1853.1052" timestamp="1593415140885" />
+    <state x="67" y="126" width="1510" height="642" key="dock-window-1" timestamp="1594113573286">
+      <screen x="67" y="27" width="1853" height="1052" />
+    </state>
+    <state x="67" y="126" width="1510" height="642" key="dock-window-1/67.27.1853.1052@67.27.1853.1052" timestamp="1594113573286" />
+    <state x="683" y="287" width="621" height="522" key="find.popup" timestamp="1593667348835">
+      <screen x="67" y="27" width="1853" height="1052" />
+    </state>
+    <state x="683" y="287" width="621" height="522" key="find.popup/67.27.1853.1052@67.27.1853.1052" timestamp="1593667348835" />
+    <state x="657" y="249" key="run.anything.popup" timestamp="1593665906476">
+      <screen x="67" y="27" width="1853" height="1052" />
+    </state>
+    <state x="657" y="249" key="run.anything.popup/67.27.1853.1052@67.27.1853.1052" timestamp="1593665906476" />
+  </component>
+</project>
