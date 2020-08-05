@@ -5,18 +5,18 @@
  */
 const http = require('http');
 // const cluster = require('cluster');
-// const os = require('os');
+const os = require('os');
+const isDocker = require('is-docker');
 const config = require('../server/config')[process.env.NODE_ENV || 'development'];
 const app = require('../server/app')(config);
-const mongodb = require('../server/lib/database/mongoose');
 
-const { initialiseAuthentication } = require('../server/lib/auth');
+const mongodb = require('../server/lib/database/mongoose');
 
 const log = config.log();
 
-// const numCPUs = os.cpus().length;
+const numCPUs = os.cpus().length;
 
-// Helper functions
+/* Helper functions */
 
 /**
  * Normalize a port into a number, string, or false.
@@ -34,17 +34,25 @@ function normalizePort(val) {
   }
   return false;
 }
+/**
+ * Set Database.
+ * The default option assumes mongodb
+ * is within a docker container.
+ * If otherwise database resides on
+ * the host
+ */
+const database = function setDatabase() {
+  if (isDocker()) {
+    return config.dockerDatabase.dsn;
+  }
+  return config.hostDatabase.dsn;
+};
 
 /**
  * Get port from environment and store in Express.
  */
 const port = normalizePort(process.env.PORT || '3000');
 app.set('port', port);
-
-/**
- * Add authentication to the application
- */
-initialiseAuthentication(app);
 
 /**
  * Create HTTP server and listen on the provided port
@@ -60,18 +68,10 @@ const server = http.createServer(app);
 //     log.fatal(`Worker ${worker.process.pid} just died`);
 //     cluster.fork();
 //   });
-// } else {
-//   db.connect(config.database.dsn)
-//     .then(() => {
-//       log.info('Connected to MongoDB');
-//       server.listen(port);
-//     })
-//     .catch(err => {
-//       log.fatal(err);
-//     });
-// }
+// } else {}
+
 mongodb
-  .connect(config.database.dsn)
+  .connect(database)
   .then(() => {
     log.info('Connected to MongoDB');
     server.listen(port);
@@ -79,6 +79,7 @@ mongodb
   .catch(err => {
     log.fatal(err);
   });
+
 server.on('listening', () => {
   const addr = server.address();
   const bind = typeof addr === 'string' ? `pipe ${addr}` : `port ${addr.port}`;
