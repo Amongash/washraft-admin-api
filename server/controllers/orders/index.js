@@ -2,6 +2,21 @@
 const { Order } = require('../../models');
 
 // const OrderStatus = require('../../models/OrderStatusModel');
+function isJson(item) {
+  item = typeof item !== 'string' ? JSON.stringify(item) : item;
+
+  try {
+    item = JSON.parse(item);
+  } catch (e) {
+    return false;
+  }
+
+  if (typeof item === 'object' && item !== null) {
+    return true;
+  }
+
+  return false;
+}
 
 exports.index = async (req, res, next) => {
   Order.find({}, (err, orders) => {
@@ -13,38 +28,20 @@ exports.index = async (req, res, next) => {
 // eslint-disable-next-line consistent-return
 exports.addNewOrder = async (req, res, next) => {
   try {
-    // const orderItems = [
-    //   {
-    //     type: 'shirt',
-    //     unit: 5,
-    //     price: 100,
-    //   },
-    //   {
-    //     type: 'shirt',
-    //     unit: 10,
-    //     price: 50,
-    //   },
-    // ];
-
-    // TODO Remove hardcoded order items and use posted order items
-
-    const { orderItems } = req.body;
-
+    let { orderItems } = req.body;
+    orderItems = !isJson(orderItems) ? JSON.parse(orderItems) : orderItems;
     if (req.user) {
       const order = new Order({
         userId: req.user._id,
-        totalQuantity: req.body.totalQuantity,
+        totalWeightQuantity: req.body.totalWeightQuantity,
         status: req.body.status,
         remarks: req.body.remarks,
-        items: JSON.parse(orderItems),
+        items: orderItems,
       });
-      await order.save((err, items) => {
-        if (err) return next(err);
-        console.log(items);
-        return res.json({ success: true, message: 'Order received successfully' });
-      });
+      const savedOrder = await order.save();
+      if (savedOrder) return res.json({ success: true, message: 'Order received successfully' });
+      return next();
     }
-    console.log('User must be logged in');
     return res.json({ Error: 'Unable to create order' });
   } catch (err) {
     return next(err);

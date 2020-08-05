@@ -18,7 +18,7 @@ exports.addNewItem = async (req, res, next) => {
     const savedItem = await item.save();
     if (savedItem) {
       console.log(`ItemPrice has been saved`, savedItem);
-      return res.json({success: true, message: 'Item has been saved successfully'});
+      return res.json({ success: true, message: 'Item has been saved successfully' });
     }
     return next(new Error('Failed to save item for unknown reasons'));
   } catch (err) {
@@ -48,7 +48,7 @@ exports.update = async (req, res, next) => {
       (err, item) => {
         if (err) return next(new Error('Failed to update item for unknown reasons'));
         console.log(`ItemPrice: `, item);
-        return res.json({ success: true, message: 'Item updated successfully', item: item });
+        return res.json({ success: true, message: 'Item updated successfully', item });
       }
     );
   } catch (err) {
