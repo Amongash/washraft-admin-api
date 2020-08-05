@@ -14,15 +14,14 @@ const strategy = () => {
   };
 
   const verifyCallback = async (req, jwtPayload, cb) => {
-    // eslint-disable-next-line no-underscore-dangle
-    const [err, user] = getUserById(jwtPayload.data._id);
-
-    if (err) {
-      return cb(err);
+    try {
+      // eslint-disable-next-line no-underscore-dangle
+      const user = await getUserById(jwtPayload.data._id);
+      req.user = user;
+      return cb(null, user);
+    } catch (error) {
+      return cb(error);
     }
-
-    req.user = user;
-    return cb(null, user);
   };
 
   passport.use(new JWTStrategy(strategyOptions, verifyCallback));
@@ -40,4 +39,4 @@ const login = (req, user) => {
   });
 };
 
-export { strategy, login };
+module.exports = { strategy, login };
