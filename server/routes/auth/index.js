@@ -13,9 +13,9 @@ module.exports = params => {
     // TODO Add application logic to provide the login page to the user.
     if (!req.user) {
       console.log('Login page');
-      return res.json('Login page');
+      return res.json({ message: 'User has not logged in!' });
     }
-    return res.redirect('/');
+    return res.json({ message: 'User is logged in.' });
   });
 
   router.post('/login', auth.sign_in);

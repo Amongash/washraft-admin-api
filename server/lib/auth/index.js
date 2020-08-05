@@ -3,9 +3,9 @@ import * as strategies from './strategies';
 
 const pipe = (...functions) => args => functions.reduce((arg, fn) => fn(arg), args);
 
-exports.initialiseAuthentication = app => {
+const initialiseAuthentication = app => {
   utils.setup();
-  pipe(strategies.JWTStrategy, strategies.FacebookStrategy, strategies.GoogleStrategy)(app);
+  pipe(strategies.FacebookStrategy, strategies.GoogleStrategy, strategies.JWTStrategy)(app);
 };
 
-exports = { utils, strategies };
+export { utils, initialiseAuthentication, strategies };

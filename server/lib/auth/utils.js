@@ -53,6 +53,7 @@ const checkIsInRole = (...roles) => (req, res, next) => {
 };
 
 const getRedirectUrl = role => {
+  if (role) console.log(`Logged in as:`, role);
   switch (role) {
     case 'Admin':
       return '/admin-dashboard';

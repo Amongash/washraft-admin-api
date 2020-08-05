@@ -12,10 +12,7 @@ const MongoStore = require('connect-mongo')(session);
 const passport = require('passport');
 const routes = require('./routes');
 const ImageService = require('./services/ImageService');
-const { utils } = require('./lib/auth');
-
-const ROLES = require('./helpers/roles');
-const Role = require('./models/Role');
+const { initialiseAuthentication } = require('./lib/auth');
 
 module.exports = config => {
   const app = express();
@@ -39,7 +36,7 @@ module.exports = config => {
 
   app.use(
     session({
-      secret: 'very secret 12345',
+      secret: '123',
       resave: true,
       saveUninitialized: false,
       store: new MongoStore({ mongooseConnection: mongoose.connection }),
@@ -52,26 +49,21 @@ module.exports = config => {
 
   if (app.get('env') === 'production') {
     app.set('trust proxy', 'loopback');
+    // Serve secure cookies, requires HTTPS
+    // session.cookie.secure = true;
   }
 
   app.use(passport.initialize());
   app.use(passport.session());
+  // Add authentication to the application
+  initialiseAuthentication(app);
+
   app.use(async (req, res, next) => {
     res.locals.user = req.user;
     return next();
   });
 
   app.use('/', routes({ images }));
-
-  app.get(
-    '/admin-dashboard',
-    passport.authenticate('jwt', { failureRedirect: '/login' }),
-    // utils.checkIsInRole(ROLES.Admin),
-    (req, res) => {
-      console.log(`Logged in as `, ROLES.Admin);
-      return res.redirect('/');
-    }
-  );
 
   // catch 404 and forward to error handler
   app.use((req, res, next) => {
