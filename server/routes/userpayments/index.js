@@ -7,10 +7,14 @@ const router = express.Router();
 module.exports = params => {
   router.get('/', userpayments.index);
   router.post('/new', userpayments.new);
+  router.get('/validation', userpayments.validation);
 
   router.get('/:paymentId', userpayments.getById);
+  router.get('/userId/:userId', userpayments.getByUserId);
   router.put('/:paymentId', userpayments.update);
   // router.delete('/:paymentId', userpayments.delete); *Not required
+
+  router.post('/test', userpayments.test);
 
   return router;
 };

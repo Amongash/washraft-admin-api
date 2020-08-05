@@ -4,7 +4,6 @@ const UserSchema = mongoose.Schema(
   {
     providerId: {
       type: String,
-      required: true,
     },
     provider: { type: String },
     firstName: {
