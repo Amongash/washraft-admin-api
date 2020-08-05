@@ -28,6 +28,7 @@ const createFakeUser = async () => {
   }
 };
 
+// eslint-disable-next-line consistent-return
 const createFakeUserOrders = async () => {
   try {
     const orders = [];
@@ -70,10 +71,8 @@ const createFakeUserOrders = async () => {
           }
           const createdOrders = await Order.create(orders);
           if (createdOrders) return Promise.resolve(createdOrders);
-          return true;
         });
     });
-    return true;
   } catch (error) {
     return Promise.reject(error);
   }
@@ -81,12 +80,13 @@ const createFakeUserOrders = async () => {
 /**
  * Set Database
  */
-const database = function setDatabase() {
+function setDatabase() {
   if (isDocker()) {
     return config.dockerDatabase.dsn;
   }
   return config.hostDatabase.dsn;
-};
+}
+const database = setDatabase();
 
 /**
  * connect to the database server

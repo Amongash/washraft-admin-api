@@ -5,7 +5,7 @@
  */
 const http = require('http');
 // const cluster = require('cluster');
-const os = require('os');
+// const os = require('os');
 const isDocker = require('is-docker');
 const config = require('../server/config')[process.env.NODE_ENV || 'development'];
 const app = require('../server/app')(config);
@@ -14,7 +14,7 @@ const mongodb = require('../server/lib/database/mongoose');
 
 const log = config.log();
 
-const numCPUs = os.cpus().length;
+// const numCPUs = os.cpus().length;
 
 /* Helper functions */
 
@@ -41,12 +41,12 @@ function normalizePort(val) {
  * If otherwise database resides on
  * the host
  */
-const database = function setDatabase() {
+function setDatabase() {
   if (isDocker()) {
     return config.dockerDatabase.dsn;
   }
   return config.hostDatabase.dsn;
-};
+}
 
 /**
  * Get port from environment and store in Express.
@@ -58,7 +58,7 @@ app.set('port', port);
  * Create HTTP server and listen on the provided port
  */
 const server = http.createServer(app);
-
+const database = setDatabase();
 // if (cluster.isMaster) {
 //   log.info(`Master ${process.pid} is running`);
 //   for (let i = 0; i < numCPUs; i += 1) {
