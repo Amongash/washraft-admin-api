@@ -1,0 +1,33 @@
+version: '3'
+volumes:
+  mongodb_data:
+    driver: local
+services:
+  washraft-api:
+    container_name: washraft-admin-api
+    image: amongash/washraft-admin-api:latest
+    restart: always
+    build: .
+    ports:
+      - '3000:3000'
+    networks:
+      - washraft-api-network
+    depends_on:
+      - mongo
+    links:
+      - mongo
+  mongo:
+    container_name: mongo
+    image: mongo
+    volumes:
+      - mongodb_data:/data/db
+    ports:
+      - '27017:27017'
+    logging:
+      driver: 'none'
+    networks:
+      - washraft-api-network
+
+networks:
+  washraft-api-network:
+    driver: bridge
