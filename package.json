@@ -1,7 +1,7 @@
 {
   "name": "admin-backend",
   "version": "1.0.0",
-  "description": "HTML Template",
+  "description": "Washraft Admin API",
   "main": "app.js",
   "scripts": {
     "start": "nodemon --exec babel-node bin/www --ignore public/ | bunyan",
@@ -9,7 +9,7 @@
     "seed": "node server/seeds/index.js ",
     "dev": "webpack -wd"
   },
-  "author": "Amongash",
+  "author": "Amongash08@gmail.com",
   "license": "MIT",
   "devDependencies": {
     "@babel/core": "latest",
@@ -19,7 +19,7 @@
     "@babel/preset-react": "latest",
     "babel-eslint": "^7.0.0",
     "babel-loader": "^6.2.5",
-    "browser-sync": "^2.26.7",
+    "browser-sync": "^2.26.12",
     "eslint": "^6.8.0",
     "eslint-config-airbnb-base": "^14.1.0",
     "eslint-config-prettier": "^6.10.1",
