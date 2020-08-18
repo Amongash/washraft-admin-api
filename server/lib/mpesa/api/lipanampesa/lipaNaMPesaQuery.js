@@ -2,13 +2,10 @@ const express = require('express');
 
 const lipaNaMpesaQueryRouter = express.Router();
 const moment = require('moment');
-const properties = require('nconf');
 const auth = require('../../auth');
 
+const { lipaNaMpesaConfigs } = require('../../../../config/mpesa');
 const mpesaFunctions = require('../../helpers/mpesaFunctions');
-// Then load properties from a designated file.
-
-properties.file({ file: 'config/properties.json' });
 
 const LIPA_NA_MPESA_SERVICE_NAME = 'STK-PUSH';
 
@@ -39,9 +36,9 @@ const confirmSourceOfTrnx = (req, res, next) => {
   } else {
     console.log('Query safaricom');
     // Query
-    const BusinessShortCode = properties.get('lipaNaMpesa:shortCode');
+    const BusinessShortCode = lipaNaMpesaConfigs.shortCode;
     const timeStamp = moment().format('YYYYMMDDHHmmss');
-    const rawPass = BusinessShortCode + properties.get('lipaNaMpesa:key') + timeStamp;
+    const rawPass = BusinessShortCode + lipaNaMpesaConfigs.key + timeStamp;
 
     req.mpesaTransaction = {
       BusinessShortCode,
@@ -59,7 +56,7 @@ const querySafaricomForRecord = (req, res, next) => {
   // Set url, AUTH token and transaction
   mpesaFunctions.sendMpesaTxnToSafaricomAPI(
     {
-      url: properties.get('lipaNaMpesa:queryRequest'),
+      url: lipaNaMpesaConfigs.queryRequest,
       auth: `Bearer ${req.transactionToken}`,
       transaction: req.mpesaTransaction,
     },

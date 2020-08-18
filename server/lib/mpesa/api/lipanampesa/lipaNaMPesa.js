@@ -4,14 +4,13 @@ const stkPushRouter = express.Router();
 const moment = require('moment');
 
 // Lipa Na M-pesa model
-const properties = require('nconf');
 const LipaNaMpesa = require('./lipaNaMPesaTnxModel');
 
 const auth = require('../../auth');
-const mpesaFunctions = require('../../helpers/mpesaFunctions');
-// Then load properties from a designated file.
 
-properties.file({ file: '../../../../config/properties.json' });
+const { lipaNaMpesaConfigs } = require('../../../../config/mpesa');
+
+const mpesaFunctions = require('../../helpers/mpesaFunctions');
 
 const LIPA_NA_MPESA_SERVICE_NAME = 'STK-PUSH';
 const GENERIC_SERVER_ERROR_CODE = '01';
@@ -23,6 +22,10 @@ const GENERIC_SERVER_ERROR_CODE = '01';
  * @param next
  */
 const bootstrapRequest = (req, res, next) => {
+  /**
+   * Retrieve Lipa na Mpesa Service Name
+   * from the request body
+   */
   req.body.service = LIPA_NA_MPESA_SERVICE_NAME;
   const request = req.body;
 
@@ -41,9 +44,9 @@ const bootstrapRequest = (req, res, next) => {
   ) {
     mpesaFunctions.handleError(res, 'Invalid request received');
   } else {
-    const BusinessShortCode = properties.get('lipaNaMpesa:shortCode');
+    const BusinessShortCode = lipaNaMpesaConfigs.shortCode; // Business Shortcode
     const timeStamp = moment().format('YYYYMMDDHHmmss');
-    const rawPass = BusinessShortCode + properties.get('lipaNaMpesa:key') + timeStamp;
+    const rawPass = BusinessShortCode + lipaNaMpesaConfigs.key + timeStamp;
     // Request object
     req.mpesaTransaction = {
       BusinessShortCode,
@@ -54,7 +57,7 @@ const bootstrapRequest = (req, res, next) => {
       PartyA: request.phoneNumber,
       PartyB: BusinessShortCode,
       PhoneNumber: request.phoneNumber,
-      CallBackURL: properties.get('lipaNaMpesa:callBackURL'),
+      CallBackURL: lipaNaMpesaConfigs.callBackURL,
       AccountReference: request.accountReference,
       TransactionDesc: request.description,
     };
@@ -70,7 +73,7 @@ const postTransaction = (req, res, next) => {
   // Set url, AUTH token and transaction
   mpesaFunctions.sendMpesaTxnToSafaricomAPI(
     {
-      url: properties.get('lipaNaMpesa:processRequest'),
+      url: lipaNaMpesaConfigs.processRequest,
       auth: `Bearer ${req.transactionToken}`,
       transaction: req.mpesaTransaction,
     },

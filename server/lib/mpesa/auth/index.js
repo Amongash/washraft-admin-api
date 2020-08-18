@@ -2,18 +2,21 @@
 const moment = require('moment');
 const request = require('request');
 
+const {
+  mpesaConfigs,
+  lipaNaMpesaConfigs,
+  validationConfirmConfigs,
+} = require('../../../config/mpesa');
+
 const STK_PUSH = 'STK-PUSH';
 const C2B_URL_REGISTRATION_SERVICE_NAME = 'C2B-URL-REGISTRATION';
 const TOKEN_INVALIDITY_WINDOW = 240;
 const GENERIC_SERVER_ERROR_CODE = '01';
 
-const properties = require('nconf');
 // Authentication model
 const Token = require('./tokenModel');
 
 const mpesaFunctions = require('../helpers/mpesaFunctions');
-// Then load properties from a designated file.
-properties.file({ file: 'config/properties.json' });
 
 /**
  * Check token validity. Token validity window is set to 240 seconds
@@ -35,20 +38,21 @@ const isTokenValid = service => {
  * @param next
  */
 const setNewToken = (req, res, serviceName, newInstance, next) => {
-  let consumerKey = 'YOUR_APP_CONSUMER_KEY';
-  let consumerSecret = 'YOUR_APP_CONSUMER_SECRET';
+  let { consumerKey, consumerSecret } = mpesaConfigs;
+
   let token = {};
-  const url = properties.get('auth:url');
+  const { authenticationUrl } = mpesaConfigs;
+
   // Load consumer keys and secrets for each service
   switch (serviceName) {
     case STK_PUSH: {
-      consumerKey = properties.get('lipaNaMpesa:consumerKey');
-      consumerSecret = properties.get('lipaNaMpesa:consumerSecret');
+      consumerKey = lipaNaMpesaConfigs.consumerKey;
+      consumerSecret = lipaNaMpesaConfigs.consumerSecret;
       break;
     }
     case C2B_URL_REGISTRATION_SERVICE_NAME: {
-      consumerKey = properties.get('validationConfirm:consumerKey');
-      consumerSecret = properties.get('validationConfirm:consumerSecret');
+      consumerKey = validationConfirmConfigs.consumerKey;
+      consumerSecret = validationConfirmConfigs.consumerSecret;
       break;
     }
     default:
@@ -57,7 +61,12 @@ const setNewToken = (req, res, serviceName, newInstance, next) => {
   // Combine consumer key with the secret
   const auth = `Basic ${Buffer.from(`${consumerKey}:${consumerSecret}`).toString('base64')}`;
 
-  request({ url, headers: { Authorization: auth } }, (error, response, body) => {
+  const requestOptions = {
+    url: authenticationUrl,
+    headers: { Authorization: auth },
+  };
+
+  request(requestOptions, (error, response, body) => {
     // Process successful token response
     const tokenResp = JSON.parse(body);
 

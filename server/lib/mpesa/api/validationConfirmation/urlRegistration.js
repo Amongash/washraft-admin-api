@@ -2,15 +2,11 @@ const express = require('express');
 
 const c2bRegistrationRouter = express.Router();
 
-// Then load properties from a designated file.
-const properties = require('nconf');
-
 const auth = require('../../auth');
+const { validationConfirmConfigs } = require('../../../../config/mpesa');
 const mpesaFunctions = require('../../helpers/mpesaFunctions');
 
 const GENERIC_SERVER_ERROR_CODE = '01';
-
-properties.file({ file: 'config/properties.json' });
 
 const CallbackURLModel = require('./c2bCallbackUrlModel');
 
@@ -22,6 +18,7 @@ const C2B_URL_REGISTRATION_SERVICE_NAME = 'C2B-URL-REGISTRATION';
  * @param res
  * @param next
  */
+// eslint-disable-next-line consistent-return
 const registerMerchantCallBackUrl = (req, res, next) => {
   if (mpesaFunctions.isEmpty(req.body))
     return mpesaFunctions.handleError(res, 'Invalid request received', '01');
@@ -57,8 +54,9 @@ const registerMerchantCallBackUrl = (req, res, next) => {
         shortCode: req.body.shortCode,
       };
       const options = { multi: true };
-      CallbackURLModel.update(filter, newRecord, options, function(err) {
-        if (err)
+      // eslint-disable-next-line consistent-return
+      CallbackURLModel.update(filter, newRecord, options, error => {
+        if (error)
           return mpesaFunctions.handleError(
             res,
             `Unable to update transaction ${err.message}`,
@@ -71,6 +69,7 @@ const registerMerchantCallBackUrl = (req, res, next) => {
       console.log('Saving C2B Urls to local database');
       const callbackUrl = new CallbackURLModel(newRecord);
       //  Save new record
+      // eslint-disable-next-line consistent-return
       callbackUrl.save(error => {
         if (error) return mpesaFunctions.handleError(res, error.message, GENERIC_SERVER_ERROR_CODE);
       });
@@ -85,19 +84,19 @@ const registerMerchantCallBackUrl = (req, res, next) => {
  * @param res
  * @param next
  */
-const registerAPICallBackUrl = function(req, res, next) {
+const registerAPICallBackUrl = (req, res, next) => {
   //    Prepare request object
   const URLsRegistrationObject = {
-    ValidationURL: properties.get('validationConfirm:validationURL'),
-    ConfirmationURL: properties.get('validationConfirm:confirmationURL'),
-    ResponseType: properties.get('validationConfirm:responseType'),
-    ShortCode: properties.get('validationConfirm:shortCode'),
+    ValidationURL: validationConfirmConfigs.validationURL,
+    ConfirmationURL: validationConfirmConfigs.confirmationURL,
+    ResponseType: validationConfirmConfigs.responseType,
+    ShortCode: validationConfirmConfigs.shortCode,
   };
 
   // Set url, AUTH token and transaction
   mpesaFunctions.sendMpesaTxnToSafaricomAPI(
     {
-      url: properties.get('validationConfirm:registerURLs'),
+      url: validationConfirmConfigs.registerURLs,
       auth: `Bearer ${req.transactionToken}`,
       transaction: URLsRegistrationObject,
     },
@@ -107,7 +106,7 @@ const registerAPICallBackUrl = function(req, res, next) {
   );
 };
 
-const setServiceName = function(req, res, next) {
+const setServiceName = (req, res, next) => {
   req.body.service = C2B_URL_REGISTRATION_SERVICE_NAME;
   next();
 };
@@ -121,7 +120,7 @@ c2bRegistrationRouter.put(
   setServiceName,
   auth,
   registerAPICallBackUrl,
-  function(req, res, next) {
+  (req, res, next) => {
     res.json({
       status: '00',
       message:
@@ -137,7 +136,7 @@ c2bRegistrationRouter.post(
   '/register/merchant',
   setServiceName,
   registerMerchantCallBackUrl,
-  function(req, res, next) {
+  (req, res, next) => {
     res.json({
       status: '00',
       message: `Merchant URLs registration successful for pay bill ${req.body.shortCode}`,

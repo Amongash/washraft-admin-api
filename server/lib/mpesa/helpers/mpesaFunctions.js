@@ -61,6 +61,7 @@ const httpResponseBodyProcessor = (responseData, req, res, next) => {
  * @param next
  */
 const sendMpesaTxnToSafaricomAPI = (txnDetails, req, res, next) => {
+  console.log(txnDetails);
   request(
     {
       method: 'POST',
