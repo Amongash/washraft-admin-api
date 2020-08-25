@@ -12,7 +12,7 @@ const UserPaymentSchema = mongoose.Schema(
       ref: 'Order',
       required: true,
     },
-    paid: {
+    amount: {
       type: Number,
       required: true,
       default: 0,
@@ -22,9 +22,9 @@ const UserPaymentSchema = mongoose.Schema(
       required: true,
       default: 0,
     },
-    paymentStatus: {
-      type: Boolean,
-      default: false,
+    status: {
+      type: String,
+      default: 'Pending',
     },
   },
   { timestamps: true }
