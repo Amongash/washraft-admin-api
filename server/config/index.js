@@ -14,10 +14,10 @@ module.exports = {
     log: loggers.development,
     data: { images: path.join(__dirname, '../data/images') },
     dockerDatabase: {
-      dsn: `mongodb://mongo/${process.env.DEVELOPMENT_DB_NAME}`,
+      dsn: `mongodb://${process.env.DB}/${process.env.DEVELOPMENT_DB_NAME}`,
     },
     hostDatabase: {
-      dsn: 'mongodb://127.0.0.1:27017/development',
+      dsn: `mongodb://127.0.0.1:27017/${process.env.DEVELOPMENT_DB_NAME}`,
     },
   },
   production: {
@@ -25,7 +25,7 @@ module.exports = {
     log: loggers.production,
     data: { images: path.join(__dirname, '../data/images') },
     database: {
-      dsn: `mongodb://mongo/${process.env.PRODUCTION_DB_NAME}`,
+      dsn: `mongodb://${process.env.DB}/${process.env.PRODUCTION_DB_NAME}`,
     },
   },
   test: {
@@ -33,7 +33,7 @@ module.exports = {
     log: loggers.test,
     data: { images: path.join(__dirname, '../data/images') },
     database: {
-      dsn: `mongodb://mongo/${process.env.TEST_DB_NAME}`,
+      dsn: `mongodb://${process.env.DB}/${process.env.TEST_DB_NAME}`,
     },
   },
 };
