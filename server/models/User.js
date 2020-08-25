@@ -28,7 +28,10 @@ const UserSchema = mongoose.Schema(
       index: { unique: true },
       minlength: 8,
     },
-
+    phoneNumber: {
+      type: Number,
+      trim: true,
+    },
     image: {
       type: String,
     },
