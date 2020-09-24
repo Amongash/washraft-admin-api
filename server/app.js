@@ -12,7 +12,7 @@ const MongoStore = require('connect-mongo')(session);
 const passport = require('passport');
 const routes = require('./routes');
 const ImageService = require('./services/ImageService');
-const { initialiseAuthentication } = require('./lib/auth');
+const { utils, initialiseAuthentication } = require('./lib/auth');
 
 module.exports = config => {
   const app = express();
@@ -36,7 +36,8 @@ module.exports = config => {
 
   app.use(
     session({
-      secret: '123',
+      secret: 'cookie_secret',
+      name: 'cookie_name',
       resave: true,
       saveUninitialized: false,
       store: new MongoStore({ mongooseConnection: mongoose.connection }),
@@ -53,15 +54,12 @@ module.exports = config => {
     // session.cookie.secure = true;
   }
 
-  app.use(passport.initialize());
-  app.use(passport.session());
+  app.use(utils.initialize);
+  app.use(utils.session);
+  app.use(utils.setUser);
+
   // Add authentication to the application
   initialiseAuthentication(app);
-
-  app.use(async (req, res, next) => {
-    res.locals.user = req.user;
-    return next();
-  });
 
   app.use('/', routes({ images }));
 
