@@ -1,33 +1,76 @@
-const { Mpesa } = require('mpesa-api');
-const { mpesaConfigs, credentials, environment } = require('../../config/mpesa');
-const { UserPayment } = require('../../models');
+/* eslint-disable no-underscore-dangle */
+const moment = require('moment');
+const { UserPayment, Order } = require('../../models');
 
-const mpesa = new Mpesa(credentials, environment);
+const { lipaNaMpesaConfigs, mpesaFunctions } = require('../../config/mpesa');
 
 /* eslint-disable consistent-return */
-exports.index = async (req, res, next) => {
+exports.getAll = async (req, res, next) => {
   UserPayment.find({}, (err, payments) => {
     if (err) return next(err);
     return res.json(payments);
   });
 };
 
-exports.new = async (req, res, next) => {
+exports.initiate = async (req, res, next) => {
   try {
-    const payment = new UserPayment({
-      // eslint-disable-next-line no-underscore-dangle
-      userId: req.user._id,
-      paid: req.body.paid,
-      remainder: req.body.remainder,
+    /**
+     * Set Lipa na Mpesa Service Name
+     */
+    req.body.service = 'STK-PUSH';
+    const request = req.body;
+
+    const phoneNumber = !request.phoneNumber ? req.user.phoneNumber : request.phoneNumber;
+    // Check if order exists
+    Order.findOne({ id: request.orderId, userId: req.user._id }).exec(err => {
+      if (err) return next(new Error('Order does not exist.'));
+      if (!(request.amount || phoneNumber || request.description)) {
+        mpesaFunctions.handleError(res, 'Invalid request received');
+      } else {
+        const BusinessShortCode = lipaNaMpesaConfigs.shortCode; // Business Shortcode
+        const CallBackURL = lipaNaMpesaConfigs.callBackURL;
+        const AccountReference = lipaNaMpesaConfigs.accountReference;
+        const TransactionDesc = lipaNaMpesaConfigs.transactionDescription;
+        const timeStamp = moment().format('YYYYMMDDHHmmss');
+        const rawPass = BusinessShortCode + lipaNaMpesaConfigs.key + timeStamp;
+        // Request object
+        req.mpesaTransaction = {
+          BusinessShortCode,
+          Password: Buffer.from(rawPass).toString('base64'),
+          Timestamp: timeStamp,
+          TransactionType: 'CustomerPayBillOnline',
+          Amount: request.amount,
+          PartyA: request.phoneNumber,
+          PartyB: BusinessShortCode,
+          PhoneNumber: request.phoneNumber,
+          CallBackURL,
+          AccountReference,
+          TransactionDesc,
+        };
+        // console.log(` POST Req: ${JSON.stringify(req.mpesaTransaction)}`);
+        next();
+      }
     });
-    const savedPayment = await payment.save();
-    if (savedPayment) {
-      console.log(`Payment has been saved`, savedPayment);
-      return res.json({ success: 'false', message: 'Payment saved successfully.' });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+exports.processPayment = async (req, res, next) => {
+  try {
+    if (req.merchantMsg.status !== '01') {
+      await UserPayment.findOneAndUpdate(
+        { orderId: req.body.orderId },
+        { $set: { status: 'Processing' } },
+        err => {
+          if (err) return next(new Error('Failed to process payment for unknown reasons.'));
+          console.log('Payment processed successfully.');
+        }
+      );
     }
-    return next(new Error('Failed to save payment for unknown reasons.'));
+    return res.json({ message: 'Awaiting payment from user.' });
   } catch (err) {
-    return next(err);
+    return next(new Error('Payment failed.'));
   }
 };
 
@@ -86,30 +129,10 @@ exports.delete = async (req, res, next) => {
   }
 };
 
-exports.validation = async (req, res, next) => {
+exports.validation = async (req, res) => {
   return res.json(res);
 };
 
-exports.confirmation = async (req, res, next) => {
+exports.confirmation = async (req, res) => {
   return res.json(res);
-};
-
-exports.test = async (req, res, next) => {
-  mpesa
-    .c2bRegister({
-      ShortCode: mpesaConfigs.shortCode,
-      ResponseType: 'Completed',
-      ConfirmationURL: 'http://localhost/payments/confirmation',
-      ValidationURL: 'http://localhost/payments/validation',
-    })
-    .then(response => {
-      // Do something with the response
-      // eg
-      console.log(response);
-    })
-    .catch(error => {
-      // Do something with the error;
-      // eg
-      console.error(error);
-    });
 };
