@@ -23,6 +23,8 @@ const lipaNaMpesaConfigs = {
   consumerKey: 'H65FlGErvyuFvsajRekG9zcRdnQ30kHO',
   consumerSecret: '2ARcZPg7Gc8gWFBd',
   callBackURL: 'http://134.122.91.17/payments/lipaNaMpesaService/callback',
+  transactionDescription: 'Laundry Payment',
+  accountReference: 'Washraft Laundry',
 };
 
 const validationConfirmConfigs = {
@@ -35,19 +37,8 @@ const validationConfirmConfigs = {
   responseType: 'Completed',
 };
 
-const credentials = {
-  client_key: process.env.MPESA_CONSUMER_KEY,
-  client_secret: process.env.MPESA_CONSUMER_SECRET,
-  initiator_password: 'Safcom236!',
-  // security_credential: 'YOUR_SECURITY_CREDENTIAL',
-  // certificatepath: 'keys/example.cert'
-};
-const environment = 'sandbox';
-
 module.exports = {
   mpesaConfigs,
   lipaNaMpesaConfigs,
   validationConfirmConfigs,
-  credentials,
-  environment,
 };

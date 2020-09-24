@@ -29,15 +29,25 @@ const queryDBForRecord = (req, res, next) => {
 };
 
 const confirmSourceOfTrnx = (req, res, next) => {
-  // If transaction is not found, query safaricom for result
+  console.log('Restructruring mpesa transaction...');
+  const timeStamp = moment().format('YYYYMMDDHHmmss');
+
   if (req.lipaNaMPesaTransaction) {
+    const tnx = req.lipaNaMPesaTransaction.mpesaInitRequest;
+    const rawPass = tnx.BusinessShortCode + lipaNaMpesaConfigs.key + timeStamp;
+    req.mpesaTransaction = {
+      BusinessShortCode: tnx.BusinessShortCode,
+      Password: Buffer.from(rawPass, 'utf8').toString('base64'),
+      Timestamp: timeStamp,
+      CheckoutRequestID: req.body.checkoutRequestId,
+    };
     req.tnxFoundLocally = true;
     next();
   } else {
     console.log('Query safaricom');
     // Query
     const BusinessShortCode = lipaNaMpesaConfigs.shortCode;
-    const timeStamp = moment().format('YYYYMMDDHHmmss');
+
     const rawPass = BusinessShortCode + lipaNaMpesaConfigs.key + timeStamp;
 
     req.mpesaTransaction = {
@@ -46,14 +56,11 @@ const confirmSourceOfTrnx = (req, res, next) => {
       Timestamp: timeStamp,
       CheckoutRequestID: req.body.checkoutRequestId,
     };
-    console.log('Req obj created');
-    // Add auth token then send to safaricom
-    auth(req, res, next);
+    console.log(`Req obj created:`, req.mpesaTransaction);
   }
 };
 
 const querySafaricomForRecord = (req, res, next) => {
-  // Set url, AUTH token and transaction
   mpesaFunctions.sendMpesaTxnToSafaricomAPI(
     {
       url: lipaNaMpesaConfigs.queryRequest,
@@ -70,6 +77,7 @@ const result = (req, res, next) => {
   if (req.transactionResp) console.log(req.transactionResp);
 
   if (req.tnxFoundLocally) {
+    console.log('here');
     res.json({
       merchantRequestId: req.lipaNaMPesaTransaction.mpesaInitResponse.MerchantRequestID,
       checkoutRequestId: req.lipaNaMPesaTransaction.mpesaInitResponse.CheckoutRequestID,
@@ -80,6 +88,7 @@ const result = (req, res, next) => {
           : req.lipaNaMPesaTransaction.mpesaInitResponse.ResponseCode,
     });
   } else {
+    console.log('now here');
     res.json({
       merchantRequestId: req.body.merchantRequestId,
       checkoutRequestId: req.body.checkoutRequestId,
@@ -87,13 +96,13 @@ const result = (req, res, next) => {
       status: req.code,
     });
   }
-  next();
 };
 
 lipaNaMpesaQueryRouter.post(
   '/',
   queryDBForRecord,
   confirmSourceOfTrnx,
+  auth,
   querySafaricomForRecord,
   result
 );

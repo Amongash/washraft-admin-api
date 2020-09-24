@@ -29,21 +29,15 @@ const bootstrapRequest = (req, res, next) => {
   req.body.service = LIPA_NA_MPESA_SERVICE_NAME;
   const request = req.body;
 
-  console.log('===========', request.phoneNumber);
+  // console.log('===========', request.phoneNumber);
   /** **************************
      {"amount":"5","phoneNumber":"2547******","callBackURL":"http://some-url","accountReference":"123456","description":"school fees"}
      ****************************** */
-  if (
-    !(
-      request.amount ||
-      request.phoneNumber ||
-      request.callBackURL ||
-      request.accountReference ||
-      request.description
-    )
-  ) {
+  if (!(request.amount || request.phoneNumber || request.description)) {
     mpesaFunctions.handleError(res, 'Invalid request received');
   } else {
+    const AccountReference =
+      request.accountReference === 'undefined' ? 'Laundry' : request.accountReference;
     const BusinessShortCode = lipaNaMpesaConfigs.shortCode; // Business Shortcode
     const timeStamp = moment().format('YYYYMMDDHHmmss');
     const rawPass = BusinessShortCode + lipaNaMpesaConfigs.key + timeStamp;
@@ -58,10 +52,10 @@ const bootstrapRequest = (req, res, next) => {
       PartyB: BusinessShortCode,
       PhoneNumber: request.phoneNumber,
       CallBackURL: lipaNaMpesaConfigs.callBackURL,
-      AccountReference: request.accountReference,
+      AccountReference,
       TransactionDesc: request.description,
     };
-    console.log(` POST Req: ${JSON.stringify(req.mpesaTransaction)}`);
+    // console.log(` POST Req: ${JSON.stringify(req.mpesaTransaction)}`);
     next();
   }
 };
@@ -85,7 +79,7 @@ const postTransaction = (req, res, next) => {
 
 const processResponse = (req, res, next) => {
   // Prepare external response message
-  console.log('Process response');
+
   req.merchantMsg = {
     status: req.transactionResp.ResponseCode === '0' ? '00' : req.transactionResp.ResponseCode,
     message: req.transactionResp.ResponseDescription,
@@ -116,17 +110,17 @@ const processResponse = (req, res, next) => {
  * Use this API to initiate online payment on behalf of a customer
  */
 
-stkPushRouter.post(
-  '/process',
-  bootstrapRequest,
-  auth,
-  postTransaction,
-  processResponse,
-  (req, res) => {
-    // Check processing status
-    res.json(req.merchantMsg);
-  }
-);
+// stkPushRouter.post(
+//   '/process',
+//   bootstrapRequest,
+//   auth,
+//   postTransaction,
+//   processResponse,
+//   (req, res) => {
+//     // Check processing status
+//     res.json(req.merchantMsg);
+//   }
+// );
 
 /**
  * Process callback request from safaricom
@@ -172,7 +166,7 @@ const updateTransaction = (req, res, next) => {
   // Set callback request to existing transaction
   req.lipaNaMPesaTransaction.mpesaCallback = req.body.Body;
   // Update existing transaction
-  LipaNaMpesa.update(conditions, req.lipaNaMPesaTransaction, options, err => {
+  LipaNaMpesa.updateOne(conditions, req.lipaNaMPesaTransaction, options, err => {
     if (err) {
       mpesaFunctions.handleError(res, 'Unable to update transaction');
     }
@@ -226,17 +220,25 @@ const forwardRequestToRemoteClient = (req, res, next) => {
   );
 };
 
-stkPushRouter.post(
-  '/callback',
+// stkPushRouter.post(
+//   '/callback',
+//   fetchTransaction,
+//   updateTransaction,
+//   forwardRequestToRemoteClient,
+//   (req, res) => {
+//     res.json({
+//       ResultCode: 0,
+//       ResultDesc: 'The service request is processed successfully.',
+//     });
+//   }
+// );
+
+module.exports = {
+  bootstrapRequest,
+  auth,
+  postTransaction,
+  processResponse,
   fetchTransaction,
   updateTransaction,
   forwardRequestToRemoteClient,
-  (req, res) => {
-    res.json({
-      ResultCode: 0,
-      ResultDesc: 'The service request is processed successfully.',
-    });
-  }
-);
-
-module.exports = stkPushRouter;
+};
