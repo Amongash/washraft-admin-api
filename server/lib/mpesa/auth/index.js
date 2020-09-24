@@ -96,7 +96,7 @@ const setNewToken = (req, res, serviceName, newInstance, next) => {
         const conditions = { service: serviceName };
         const options = { multi: true };
         // Update existing token
-        Token.update(conditions, newToken, options, (err, record) => {
+        Token.updateOne(conditions, newToken, options, (err, record) => {
           if (err) {
             mpesaFunctions.handleError(res, `Unable to update token. Service: ${serviceName}`);
           } else if (record) {
@@ -118,7 +118,6 @@ const setNewToken = (req, res, serviceName, newInstance, next) => {
 };
 
 const fetchToken = (req, res, next) => {
-  console.log('Fetching token');
   const serviceName = req.body.service;
   Token.findOne({})
     .where('service')
