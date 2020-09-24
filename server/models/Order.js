@@ -20,27 +20,38 @@ const OrderSchema = mongoose.Schema(
       type: String,
     },
     items: [OrderItem],
-    totalItemUnits: {
+    totalItems: {
       type: Number,
     },
-    totalUnitPrice: {
+    totalItemsPrice: {
       type: Number,
     },
-    totalKgPrice: {
+    totalWeightPrice: {
       type: Number,
     },
   },
   { timestamps: true }
 );
 
-const calculateTotalOrderPrice = doc => {
+const calculateTotalItemPrice = doc => {
   const order = doc;
   let totalPrice = 0;
   order.items.map(item => {
     totalPrice += item.price * item.unit;
     return totalPrice;
   });
-  order.totalUnitPrice = totalPrice;
+  order.totalItemsPrice = totalPrice;
+  return order;
+};
+
+const calculateTotalItems = doc => {
+  const order = doc;
+  let totalItems = 0;
+  order.items.map(item => {
+    totalItems += item.unit;
+    return totalItems;
+  });
+  order.totalItems = totalItems;
   return order;
 };
 
@@ -48,7 +59,8 @@ OrderSchema.pre('save', async function preSave(next) {
   try {
     const order = this;
     if (order.items === 'undefined') return next();
-    calculateTotalOrderPrice(order);
+    calculateTotalItemPrice(order);
+    calculateTotalItems(order);
     return next();
   } catch (err) {
     return next(err);
@@ -58,16 +70,18 @@ OrderSchema.pre('save', async function preSave(next) {
 OrderSchema.post('save', async function postSave(doc, next) {
   try {
     const order = doc;
-    if (order.status !== 'Pending') return next();
-    if (order.totalPricePerItem || order.totalKgPrice !== 0) {
-      const payment = new UserPayment({
-        userId: order.userId,
-        orderId: order.id,
-        paid: 0,
-        remainder: order.totalUnitPrice,
-      });
-      await payment.save();
+    if (order.status === 'Pending') {
+      if (order.totalItemsPrice !== 0) {
+        const payment = new UserPayment({
+          userId: order.userId,
+          orderId: order.id,
+          amount: 0,
+          remainder: order.totalItemsPrice,
+        });
+        await payment.save();
+      }
     }
+
     return next();
   } catch (err) {
     return next(err);
