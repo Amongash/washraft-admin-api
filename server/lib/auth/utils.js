@@ -41,12 +41,12 @@ const verifyPassword = async (candidate, actual) => {
 
 const checkIsInRole = (...roles) => (req, res, next) => {
   if (!req.user) {
-    return res.redirect('auth/login');
+    return res.redirect('/auth/login');
   }
 
   const hasRole = roles.find(role => req.user.role === role);
   if (!hasRole) {
-    return res.redirect('auth/login');
+    return res.redirect('/');
   }
 
   return next();
@@ -70,6 +70,17 @@ const getRedirectUrl = role => {
   }
 };
 
+// If user is not present redirect to login page
+const ensureAuthenticated = (req, res, next) => {
+  if (!req.user) return res.redirect('/auth/login');
+  return next();
+};
+
+const redirectIfLoggedIn = (req, res, next) => {
+  if (req.user) return res.redirect('/auth/account');
+  return next();
+};
+
 module.exports = {
   initialize: passport.initialize(),
   session: passport.session(),
@@ -83,4 +94,6 @@ module.exports = {
   verifyPassword,
   checkIsInRole,
   getRedirectUrl,
+  ensureAuthenticated,
+  redirectIfLoggedIn,
 };
