@@ -2,7 +2,7 @@ const express = require('express');
 const passport = require('passport');
 
 const auth = require('../../controllers/auth');
-const { signToken, getRedirectUrl } = require('../../lib/auth/utils');
+const { signToken, redirectIfLoggedIn, getRedirectUrl } = require('../../lib/auth/utils');
 
 const router = express.Router();
 
@@ -12,13 +12,12 @@ module.exports = params => {
   router.get('/login', (req, res) => {
     // TODO Add application logic to provide the login page to the user.
     if (!req.user) {
-      console.log('Login page');
       return res.json({ message: 'User has not logged in!' });
     }
     return res.json({ message: 'User is logged in.' });
   });
 
-  router.post('/login', auth.sign_in);
+  router.post('/login', redirectIfLoggedIn, auth.sign_in);
 
   router.get('/logout', (req, res) => {
     req.logout();
@@ -26,7 +25,7 @@ module.exports = params => {
     return res.redirect('/');
   });
 
-  router.post('/registration', auth.registration);
+  router.post('/registration', redirectIfLoggedIn, auth.registration);
 
   router.get('/account', auth.userAccount);
 
