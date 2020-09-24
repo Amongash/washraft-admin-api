@@ -39,7 +39,7 @@ exports.addNewOrder = async (req, res, next) => {
         items: orderItems,
       });
       const savedOrder = await order.save();
-      if (savedOrder) return res.json({ success: true, message: 'Order received successfully' });
+      if (savedOrder) return res.json({ success: true, message: 'Order received successfully.' });
       return next();
     }
     return res.json({ Error: 'Unable to create order' });
@@ -52,8 +52,8 @@ exports.addNewOrder = async (req, res, next) => {
 exports.getByUserId = async (req, res, next) => {
   try {
     const { userId } = req.params.userId;
-    const fields = 'totalQuantity remarks status items';
-    await Order.find(userId, fields, (err, order) => {
+    const select = 'totalWeightQuantity totalWeightPrice totalItemUnits remarks status items';
+    await Order.find(userId, select, (err, order) => {
       if (err) return next(err);
       console.log(`Order: `, order);
       return res.json(order);
@@ -87,7 +87,7 @@ exports.update = async (req, res, next) => {
       req.body,
       { new: true },
       (err, order) => {
-        if (err) return next(new Error('Failed to update order for unknown reasons'));
+        if (err) return next(new Error('Failed to update order for unknown reasons.'));
         console.log(`Order: `, order);
         return res.json(order);
       }
@@ -101,8 +101,8 @@ exports.update = async (req, res, next) => {
 exports.delete = async (req, res, next) => {
   try {
     await Order.deleteOne({ _id: req.params.orderId }, err => {
-      if (err) return next(new Error('Failed to delete order for unknown reasons'));
-      return res.json({ message: 'Order deleted successfully' });
+      if (err) return next(new Error('Failed to delete order for unknown reasons.'));
+      return res.json({ message: 'Order deleted successfully.' });
     });
   } catch (err) {
     return next(err);
