@@ -31,7 +31,7 @@ const validationConfirmConfigs = {
   registerURLs: 'https://sandbox.safaricom.co.ke/mpesa/c2b/v1/registerurl',
   consumerKey: '3uHElGTxJIBqf3LfcUJ8UJPYmV8sX25s',
   consumerSecret: 'PbhGFEm9Adu0VA7g',
-  shortCode: '600169',
+  shortCode: '600236',
   confirmationURL: 'http://134.122.91.17/payments/payBill/confirmation',
   validationURL: 'http://134.122.91.17/payments/account/validation',
   responseType: 'Completed',
