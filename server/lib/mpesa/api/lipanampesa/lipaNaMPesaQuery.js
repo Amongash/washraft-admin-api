@@ -77,7 +77,6 @@ const result = (req, res, next) => {
   if (req.transactionResp) console.log(req.transactionResp);
 
   if (req.tnxFoundLocally) {
-    console.log('here');
     res.json({
       merchantRequestId: req.lipaNaMPesaTransaction.mpesaInitResponse.MerchantRequestID,
       checkoutRequestId: req.lipaNaMPesaTransaction.mpesaInitResponse.CheckoutRequestID,
@@ -88,7 +87,6 @@ const result = (req, res, next) => {
           : req.lipaNaMPesaTransaction.mpesaInitResponse.ResponseCode,
     });
   } else {
-    console.log('now here');
     res.json({
       merchantRequestId: req.body.merchantRequestId,
       checkoutRequestId: req.body.checkoutRequestId,
