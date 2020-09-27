@@ -1,0 +1,39 @@
+version: "3"
+volumes:
+  mongodb_data:
+    driver: local
+  node_modules:
+
+services:
+  api:
+    container_name: api
+    restart: always
+    build: .
+    ports:
+      - "4000:4000"
+    volumes:
+      - ./:/home/node/app
+      - node_modules:/home/node/app/node_modules
+    networks:
+      - api-network
+    depends_on:
+      - db
+    links:
+      - db
+    command: npm i
+  db:
+    container_name: dev-database
+    image: mongo
+    volumes:
+      - mongodb_data:/data/db
+      - /home/washraft/data/db/:/home/washraft-db/development
+    ports:
+      - "3003:3003"
+    logging:
+      driver: "none"
+    networks:
+      - api-network
+
+networks:
+  api-network:
+    driver: bridge
