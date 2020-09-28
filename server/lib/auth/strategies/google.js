@@ -11,7 +11,7 @@ const strategy = app => {
   const strategyOptions = {
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: `${process.env.SERVER_API_URL}/auth/google/callback`,
+    callbackURL: `${process.env.SERVER_API_URL}:${process.env.PORT}/auth/google/callback`,
   };
 
   const verifyCallback = async (accessToken, refreshToken, profile, done) => {
