@@ -22,7 +22,7 @@ const lipaNaMpesaConfigs = {
   shortCode: '174379',
   consumerKey: 'H65FlGErvyuFvsajRekG9zcRdnQ30kHO',
   consumerSecret: '2ARcZPg7Gc8gWFBd',
-  callBackURL: 'http://134.122.91.17/payments/lipaNaMpesaService/callback',
+  callBackURL: `${process.env.SERVER_API_URL}:${process.env.PORT}/payments/lipaNaMpesaService/callback`,
   transactionDescription: 'Laundry Payment',
   accountReference: 'Washraft Laundry',
 };
@@ -32,8 +32,8 @@ const validationConfirmConfigs = {
   consumerKey: '3uHElGTxJIBqf3LfcUJ8UJPYmV8sX25s',
   consumerSecret: 'PbhGFEm9Adu0VA7g',
   shortCode: '600236',
-  confirmationURL: 'http://134.122.91.17/payments/payBill/confirmation',
-  validationURL: 'http://134.122.91.17/payments/account/validation',
+  confirmationURL: `${process.env.SERVER_API_URL}:${process.env.PORT}/c2b/confirm`,
+  validationURL: `${process.env.SERVER_API_URL}:${process.env.PORT}/c2b/validate`,
   responseType: 'Completed',
 };
 
