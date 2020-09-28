@@ -36,6 +36,11 @@ const httpResponseBodyProcessor = (responseData, req, res, next) => {
       // Successful processing
       req.transactionResp = responseData.body;
       next();
+    } else if (responseData.body.ResponseDescription === 'success') {
+      console.log(`POST Resp: ${JSON.stringify(responseData.body)}`);
+      // Successful processing
+      req.transactionResp = responseData.body;
+      next();
     } else {
       return handleError(
         res,
@@ -61,7 +66,6 @@ const httpResponseBodyProcessor = (responseData, req, res, next) => {
  * @param next
  */
 const sendMpesaTxnToSafaricomAPI = (txnDetails, req, res, next) => {
-  console.log(txnDetails);
   request(
     {
       method: 'POST',
@@ -151,7 +155,7 @@ const fetchLipaNaMpesaTransaction = (keys, req, res, next) => {
 };
 
 const isEmpty = val => {
-  return !(val !== undefined && val != null && val.length > 0);
+  return val === undefined && val === null && val.length <= 0;
 };
 
 // Export model
