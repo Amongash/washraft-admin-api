@@ -12,7 +12,7 @@ const strategy = app => {
   const strategyOptions = {
     clientID: process.env.FACEBOOK_APP_ID,
     clientSecret: process.env.FACEBOOK_APP_SECRET,
-    callbackURL: `${process.env.SERVER_API_URL}/auth/facebook/callback`,
+    callbackURL: `${process.env.SERVER_API_URL}:${process.env.PORT}/auth/facebook/callback`,
     profileFields: ['id', 'displayName', 'name', 'email'],
   };
 
