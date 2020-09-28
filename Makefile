@@ -11,4 +11,4 @@ clean-build:
 	@echo "Cleaning up development environment..."
 	docker-compose rm -vf
 	@echo "Creating new development environment..."
-	docker compose up --build 
+	docker-compose up --build 
