@@ -1,4 +1,4 @@
-version: "3"
+version: '3'
 volumes:
   mongodb_data:
     driver: local
@@ -10,7 +10,7 @@ services:
     restart: always
     build: .
     ports:
-      - "4000:4000"
+      - '4000:4000'
     volumes:
       - ./:/home/node/app
       - node_modules:/home/node/app/node_modules
@@ -28,9 +28,9 @@ services:
       - mongodb_data:/data/db
       - /home/washraft/data/db/:/home/washraft-db/development
     ports:
-      - "3003:3003"
+      - '3003:27017'
     logging:
-      driver: "none"
+      driver: 'none'
     networks:
       - api-network
 
